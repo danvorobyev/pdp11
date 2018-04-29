@@ -181,5 +181,7 @@ void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
             R[reg] += 2;
         case 3:
             R[reg] += 2;
+
+
     }
 }
