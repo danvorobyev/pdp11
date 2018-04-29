@@ -112,8 +112,7 @@ int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 
 }
 
-int16_t * before_exec(int16_t operand, int16_t * R, int16_t* mem, int16_t *pc){
-    int16_t* x;
+int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte){
 
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
@@ -122,29 +121,38 @@ int16_t * before_exec(int16_t operand, int16_t * R, int16_t* mem, int16_t *pc){
     {
         case 0:
             return &R[reg];
+
         case 1:
+            return (int16_t *)(mem + R[reg]);
 
-            return x;
         case 2:
+            if (reg == 7)
+                return (int16_t *)(mem + *pc + 2);
+            return (int16_t *)(mem + R[reg]);
 
-            return x;
         case 3:
+            if (reg == 7)
+                return (int16_t *)(mem + *(int16_t *)(mem + *pc + 2));
+            return (int16_t *)(mem + *(int16_t *)(mem + R[reg]));
 
-            return x;
         case 4:
+            R[reg] -= (byte + 1);
+            return (int16_t *)(mem + R[reg]);
 
-            return x;
         case 5:
+            R[reg] -= 2;
+            return (int16_t *)(mem + *(int16_t *)(mem + R[reg]));
 
-            return x;
         case 6:
 
-            return x;
+            return NULL;
+
         case 7:
 
-            return x;
+            return NULL;
         default:
             return NULL;
 
     }
 }
+
