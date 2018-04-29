@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdio.h>
 #include "decode_inst.h"
 
 #define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
@@ -8,6 +9,7 @@ int exec_command(int16_t* R, char* mem, int16_t* pc){
     int ret_status;
 
     while(1){
+
         ret_status = decode_A_type(inst, R, mem, pc);
         if(ret_status == EXEC_OK)
             break;
@@ -27,6 +29,7 @@ int exec_command(int16_t* R, char* mem, int16_t* pc){
         if(ret_status == EXEC_OK)
             break;
         break;
+
     }
 
     return ret_status;
@@ -48,6 +51,7 @@ int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 4, command = 12
 {
     int opcode = slice(inst, 12, 4);
+
     switch (opcode)
     {
         case ADD:
@@ -106,4 +110,41 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 13, command = 3
 {
 
+}
+
+int16_t * before_exec(int16_t operand, int16_t * R, int16_t* mem, int16_t *pc){
+    int16_t* x;
+
+    int16_t mode = (operand >> 3) & (int16_t)(0x7);
+    int16_t reg = operand & (int16_t)(0x7);
+
+    switch(mode)
+    {
+        case 0:
+            return &R[reg];
+        case 1:
+
+            return x;
+        case 2:
+
+            return x;
+        case 3:
+
+            return x;
+        case 4:
+
+            return x;
+        case 5:
+
+            return x;
+        case 6:
+
+            return x;
+        case 7:
+
+            return x;
+        default:
+            return NULL;
+
+    }
 }

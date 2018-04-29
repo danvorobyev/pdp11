@@ -1,6 +1,8 @@
 #ifndef PDP11_DECODE_INST_H
 #define PDP11_DECODE_INST_H
 
+#define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
+
 enum opcode
 {
     MOV  = 0x1,
@@ -19,6 +21,8 @@ enum exec_command_status
     EXEC_OK,
     EXEC_EXIT
 };
+
+
 
 int exec_command(int16_t* R, char* mem, int16_t* pc);
 

@@ -23,9 +23,9 @@ int main(int argc, char * argv[])
             break;
     }
 
-//    int16_t inst = *(int16_t*)(mem + pc);
+//    int16_t inst = 0x28;
 //    printf("%x\n", inst);
-//    int kek = slice(inst, 12, 4);
+//    int kek = slice(inst, 0, 3);
 //    printf("%x\n", kek);
     return 0;
 
