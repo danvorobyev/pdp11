@@ -64,6 +64,8 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
             op2 = before_exec(dd, R, mem, pc, 1);
 
             add_op(op1, op2, pc);
+            after_exec(ss, R, mem, pc);
+            after_exec(dd, R, mem, pc);
             return EXEC_OK;
         case MOV:
             op1 = before_exec(ss, R, mem, pc, 1);
@@ -123,7 +125,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 //
 //}
 
-int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte){
+int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte)
+{
 
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
@@ -166,4 +169,17 @@ int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int 
 
     }
 }
+void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
+{
 
+    int16_t mode = (operand >> 3) & (int16_t)(0x7);
+    int16_t reg = operand & (int16_t)(0x7);
+
+    switch(mode)
+    {
+        case 2:
+            R[reg] += 2;
+        case 3:
+            R[reg] += 2;
+    }
+}
