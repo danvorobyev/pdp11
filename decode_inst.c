@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "decode_inst.h"
+#include "inst_set.h"
 
 #define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
 
@@ -25,9 +26,9 @@ int exec_command(int16_t* R, char* mem, int16_t* pc){
         ret_status = decode_E_type(inst, R, mem, pc);
         if(ret_status == EXEC_OK)
             break;
-        ret_status = decode_F_type(inst, R, mem, pc);
-        if(ret_status == EXEC_OK)
-            break;
+//        ret_status = decode_F_type(inst, R, mem, pc);
+//        if(ret_status == EXEC_OK)
+//            break;
         break;
 
     }
@@ -41,8 +42,7 @@ int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
     switch(opcode)
     {
         case HALT:
-            //TODO: halt;
-            return EXEC_OK;
+            return EXEC_EXIT;
         default:
             return EXEC_EXIT;
     }
@@ -51,14 +51,23 @@ int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 4, command = 12
 {
     int opcode = slice(inst, 12, 4);
+    int16_t* op1;
+    int16_t* op2;
+
+    int16_t ss =(int16_t)(slice(inst, 6, 6));
+    int16_t dd =(int16_t)(slice(inst, 0, 6));
 
     switch (opcode)
     {
         case ADD:
-            //TODO: add;
+            op1 = before_exec(ss, R, mem, pc, 1);
+            op2 = before_exec(dd, R, mem, pc, 1);
+            add_op(op1, op2, pc);
             return EXEC_OK;
         case MOV:
-            //TODO: mov;
+            op1 = before_exec(ss, R, mem, pc, 1);
+            op2 = before_exec(dd, R, mem, pc, 1);
+            mov_op(op1, op2, pc);
             return EXEC_OK;
         case MOVB:
             return EXEC_OK;
@@ -107,10 +116,10 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
     }
 }
 
-int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 13, command = 3
-{
-
-}
+//int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 13, command = 3
+//{
+//
+//}
 
 int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte){
 

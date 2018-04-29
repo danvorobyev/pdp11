@@ -22,7 +22,7 @@ enum exec_command_status
     EXEC_EXIT
 };
 
-
+int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte);
 
 int exec_command(int16_t* R, char* mem, int16_t* pc);
 
@@ -31,6 +31,6 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
 int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
 int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
 int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
+//int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
 
 #endif //PDP11_DECODE_INST_H

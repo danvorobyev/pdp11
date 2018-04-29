@@ -16,7 +16,7 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* pc)
 
 inline void  mov_op(int16_t* op1, int16_t* op2, int16_t* pc)
 {
-    op2 = op1;
+
     *pc += 4;
 }
 
