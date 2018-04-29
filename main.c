@@ -12,8 +12,6 @@ int16_t pc;
 
 int main(int argc, char * argv[])
 {
-    R[0] = 0x2;
-    R[1] = 0x3;
     if (load_inst(argv[1]) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
@@ -25,8 +23,8 @@ int main(int argc, char * argv[])
             break;
     }
 
-    printf("%o\n", R[0]);
-    printf("%o\n", R[1]);
+//    printf("%o\n", R[0]);
+//    printf("%o\n", R[1]);
 //    int16_t buf1 = 0x1;
 //    int16_t buf2 = 0x2;
 //    int16_t* x;
