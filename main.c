@@ -22,6 +22,9 @@ int main(int argc, char * argv[])
         if (op_status == EXEC_EXIT)
             break;
     }
+    for(int i = 0; i < 7; i++)
+        printf("R[%d] = %o\n",i, R[i]);
+    printf("pc = %o\n", pc);
 
 //    printf("%o\n", R[0]);
 //    printf("%o\n", R[1]);

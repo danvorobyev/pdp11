@@ -23,15 +23,16 @@ int load_inst (char * file)
         sum = start + len;
         for (i = start; i < sum; i++)
         {
-            if (j == 0)
-            {
-                pc = (int16_t )(start);
-                j++;
-            }
+//            if (j == 0)
+//            {
+//                pc = (int16_t )(start);
+//                j++;
+//            }
             fscanf(f, "%x", &mem[i]);
             //printf("%02x\n", mem[i] & 0xff);
         }
     }
+    pc = (int16_t )(start);
     //printf("pc = %o", pc);
     fclose(f);
 

@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "decode_inst.h"
 #include "inst_set.h"
 
@@ -26,9 +28,9 @@ int exec_command(int16_t* R, char* mem, int16_t* pc){
         ret_status = decode_E_type(inst, R, mem, pc);
         if(ret_status == EXEC_OK)
             break;
-//        ret_status = decode_F_type(inst, R, mem, pc);
-//        if(ret_status == EXEC_OK)
-//            break;
+        ret_status = decode_F_type(inst, R, mem, pc);
+        if(ret_status == EXEC_OK)
+            break;
         break;
 
     }
@@ -60,20 +62,26 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
     switch (opcode)
     {
         case ADD:
-            op1 = before_exec(ss, R, mem, pc, 1);
-            op2 = before_exec(dd, R, mem, pc, 1);
+            op1 = before_exec(ss, R, mem, pc, WORD);
+            op2 = before_exec(dd, R, mem, pc, WORD);
 
             add_op(op1, op2, pc);
             after_exec(ss, R, mem, pc);
             after_exec(dd, R, mem, pc);
             return EXEC_OK;
         case MOV:
-            op1 = before_exec(ss, R, mem, pc, 1);
-            op2 = before_exec(dd, R, mem, pc, 1);
-
+            op1 = before_exec(ss, R, mem, pc, WORD);
+            op2 = before_exec(dd, R, mem, pc, WORD);
             mov_op(op1, op2, pc);
+            after_exec(ss, R, mem, pc);
+            after_exec(dd, R, mem, pc);
             return EXEC_OK;
         case MOVB:
+            op1 = before_exec(ss, R, mem, pc, BYTE);
+            op2 = before_exec(dd, R, mem, pc, BYTE);
+            movb_op(op1, op2, pc);
+            after_exec(ss, R, mem, pc);
+            after_exec(dd, R, mem, pc);
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -83,10 +91,14 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
 int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 7, command = 9
 {
     int opcode = slice(inst, 9, 7);
+    int16_t op1;
+    int16_t op2;
     switch(opcode)
     {
         case SOB:
-            //TODO: sob;
+            op1 = (int16_t)(slice(inst, 6, 3));
+            op2 = (int16_t)(slice(inst, 0, 6));
+            sob_op(&R[op1], &op2, pc);
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -120,12 +132,21 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
     }
 }
 
-//int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 13, command = 3
-//{
-//
-//}
+int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc)// opcode = 13, command = 3
+{
+    int opcode = slice(inst, 6, 10);
+    int16_t* op1;
+    int16_t dd =(int16_t)(slice(inst, 0, 6));
+    switch(opcode)
+    {
+        case CLR:
+            op1 = before_exec(dd, R, mem, pc, WORD);
+            clr_op(op1, pc);
+            return EXEC_OK;
+    }
+}
 
-int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byte)
+int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
 {
 
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
@@ -150,7 +171,7 @@ int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int 
             return (int16_t *)(mem + *(int16_t *)(mem + R[reg]));
 
         case 4:
-            R[reg] -= (byte + 1);
+            R[reg] -= (byteORword + 1);
             return (int16_t *)(mem + R[reg]);
 
         case 5:
@@ -179,9 +200,12 @@ void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
     {
         case 2:
             R[reg] += 2;
+            if(reg != 7)
+                *pc -= 2;
+            break;
         case 3:
             R[reg] += 2;
-
+            break;
 
     }
 }

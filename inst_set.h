@@ -26,11 +26,25 @@ inline void clr_op(int16_t* op1, int16_t* pc)
     *pc += 2;
 }
 
-//*************************** BRANCH *****************************
-
-inline void sobr_op(int16_t* op1, int16_t* pc)
+inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc)
 {
-    *op1 = 0;
+    *op2 = *op1;
+    *pc += 4;
+}
+
+//*************************** BRA2NCH *****************************
+
+inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc)
+{
+    int16_t buf = ((*op2) << 1);
+
+    if(*op1 != 1)
+    {
+        *pc -= buf;
+        //printf("%o\n", *op1 );
+        *op1 -= 1;
+        //printf("%o\n", *op1 );
+    }
     *pc += 2;
 }
 
