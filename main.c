@@ -9,6 +9,7 @@
 char mem[N_mem];
 int16_t R[7];
 int16_t pc;
+int16_t psw;
 
 
 int main(int argc, char * argv[])
