@@ -30,7 +30,6 @@ enum exec_command_status
 
 int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc);
 
-void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
 
 int exec_command(int16_t* R, char* mem, int16_t* pc);
 

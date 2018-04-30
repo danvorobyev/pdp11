@@ -192,26 +192,4 @@ int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
 
 
 
-void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
-{
 
-    int16_t mode = (operand >> 3) & (int16_t)(0x7);
-    int16_t reg = operand & (int16_t)(0x7);
-
-    switch(mode)
-    {
-        case 2:
-            R[reg] += 1 + byteORword;
-            if(reg == 7)
-                *pc += 2;
-            printf("pc = %o\n", *pc);
-            break;
-        case 3:
-            R[reg] += 2;
-            if(reg == 7)
-                *pc += 2;
-            printf("pc = %o\n", *pc);
-            break;
-
-    }
-}
