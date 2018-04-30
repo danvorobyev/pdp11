@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern char mem[20000];
+#define N_mem 20000
+
+extern char mem[N_mem];
 extern int16_t pc;
 
 int load_inst (char * file)

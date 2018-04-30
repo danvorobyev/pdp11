@@ -12,11 +12,11 @@ enum opcode
     BEQ  = 014,
     BR   = 04,
     TSTB = 01057,
-    CLR = 050,
+    CLR  = 050,
     HALT = 00
 };
 
-enum size
+enum byteORword
 {
     BYTE,
     WORD
@@ -28,8 +28,9 @@ enum exec_command_status
     EXEC_EXIT
 };
 
-int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
-void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc);
+int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc);
+
+void after_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
 
 int exec_command(int16_t* R, char* mem, int16_t* pc);
 

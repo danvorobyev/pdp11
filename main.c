@@ -12,16 +12,18 @@ int16_t pc;
 
 int main(int argc, char * argv[])
 {
+//************LOADING INFORMATION**********
     if (load_inst(argv[1]) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-
+//******DECODING AND DOING_OPERATIONS******
     while (1)
     {
         int op_status = exec_command(R, mem, &pc);
         if (op_status == EXEC_EXIT)
             break;
     }
+//**********PRINTING REGISTERS**************
     for(int i = 0; i < 7; i++)
         printf("R[%d] = %o\n",i, R[i]);
     printf("pc = %o\n", pc);

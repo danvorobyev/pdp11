@@ -10,6 +10,7 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* pc)
 {
     *op2 = *op1 + *op2;
     *pc += 2;
+    printf("funcADD :pc = %o\n", *pc);
 }
 
 //************************ STORE AND LOAD ************************
@@ -17,7 +18,8 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* pc)
 inline void  mov_op(int16_t* op1, int16_t* op2, int16_t* pc)
 {
     *op2 = *op1;
-    *pc += 4;
+    *pc += 2;
+    printf("funcMOV :pc = %o\n", *pc);
 }
 
 inline void clr_op(int16_t* op1, int16_t* pc)
@@ -26,13 +28,8 @@ inline void clr_op(int16_t* op1, int16_t* pc)
     *pc += 2;
 }
 
-inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc)
-{
-    *op2 = *op1;
-    *pc += 4;
-}
 
-//*************************** BRA2NCH *****************************
+//*************************** BRANCH *****************************
 
 inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc)
 {
