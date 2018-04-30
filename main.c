@@ -14,6 +14,7 @@ int16_t psw;
 
 int main(int argc, char * argv[])
 {
+    scanf("%d", (int*)&psw);
 //************LOADING INFORMATION**********
     if (load_inst(argv[1]) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -21,7 +22,7 @@ int main(int argc, char * argv[])
 //******DECODE AND EXECUTE OPERATIONS******
     while (1)
     {
-        int op_status = exec_command(R, mem, &pc);
+        int op_status = exec_command(R, mem, &pc, &psw);
         if (op_status == EXEC_EXIT)
             break;
     }

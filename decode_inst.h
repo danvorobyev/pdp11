@@ -31,13 +31,13 @@ enum exec_command_status
 int16_t * exec(int16_t operand, int16_t * R, char* mem, int16_t *pc);
 
 
-int exec_command(int16_t* R, char* mem, int16_t* pc);
+int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw);
 
-int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
-int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc);
+int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
+int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
+int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
+int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
+int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
+int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw);
 
 #endif //PDP11_DECODE_INST_H
