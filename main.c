@@ -16,7 +16,7 @@ int main(int argc, char * argv[])
     if (load_inst(argv[1]) != EXIT_SUCCESS)
         return EXIT_FAILURE;
 
-//******DECODING AND DOING_OPERATIONS******
+//******DECODE AND EXECUTE OPERATIONS******
     while (1)
     {
         int op_status = exec_command(R, mem, &pc);
@@ -28,23 +28,6 @@ int main(int argc, char * argv[])
         printf("R[%d] = %o\n",i, R[i]);
     printf("pc = %o\n", pc);
 
-//    printf("%o\n", R[0]);
-//    printf("%o\n", R[1]);
-//    int16_t buf1 = 0x1;
-//    int16_t buf2 = 0x2;
-//    int16_t* x;
-//    int16_t* y;
-//    x = &buf1;
-//    y = &buf2;
-//
-//    x = y;
-//
-//    printf("%x\n", *x);
-
-//    int16_t inst = 0x28;
-//    printf("%x\n", inst);
-//    int kek = slice(inst, 0, 3);
-//    printf("%x\n", kek);
     return 0;
 
 }
