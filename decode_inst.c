@@ -7,7 +7,8 @@
 
 #define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
 
-int exec_command(int16_t* R, char* mem, int16_t* pc){
+int exec_command(int16_t* R, char* mem, int16_t* pc)
+{
     int16_t inst = *(int16_t*)(mem + *pc); // for 16bit instructions
     int ret_status;
 
@@ -62,20 +63,16 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc) // opcode = 
     switch (opcode)
     {
         case ADD:
-            op1 = before_exec(ss, R, mem, pc);
-            op2 = before_exec(dd, R, mem, pc);
+            op1 = exec(ss, R, mem, pc);
+            op2 = exec(dd, R, mem, pc);
 
             add_op(op1, op2, pc);
 
-            after_exec(ss, R, mem, pc, WORD);
-            after_exec(dd, R, mem, pc, WORD);
             return EXEC_OK;
         case MOV:
-            op1 = before_exec(ss, R, mem, pc);
-            op2 = before_exec(dd, R, mem, pc);
+            op1 = exec(ss, R, mem, pc);
+            op2 = exec(dd, R, mem, pc);
             mov_op(op1, op2, pc);
-            after_exec(ss, R, mem, pc, WORD);
-            after_exec(dd, R, mem, pc, WORD);
             return EXEC_OK;
        /* case MOVB:
             op1 = before_exec(ss, R, mem, pc);
@@ -141,19 +138,19 @@ int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc)// opcode = 1
     switch(opcode)
     {
         case CLR:
-            op1 = before_exec(dd, R, mem, pc);
+            op1 = exec(dd, R, mem, pc);
             clr_op(op1, pc);
             return EXEC_OK;
     }
 }
 
 
-int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
+int16_t * exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
 {
 
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
-
+    int16_t buf;
     switch(mode)
     {
         case 0:
@@ -164,12 +161,22 @@ int16_t * before_exec(int16_t operand, int16_t * R, char* mem, int16_t *pc)
 
         case 2:
             if (reg == 7)
-                return (int16_t *)(mem + *pc + 2);
-            return (int16_t *)(mem + R[reg]);
+            {
+                *pc += 2;
+                return (int16_t *)(mem + *pc);
+            }
+            buf = R[reg];
+            R[reg] += 2;
+            return (int16_t *)(mem + buf);
         case 3:
             if (reg == 7)
-                return (int16_t *)(mem + *(int16_t *)(mem + *pc + 2));
-            return (int16_t *)(mem + *(int16_t *)(mem + R[reg]));
+            {
+                *pc += 2;
+                return (int16_t *)(mem + *(int16_t *)(mem + *pc));
+            }
+            buf = R[reg];
+            R[reg] += 2;
+            return (int16_t *)(mem + *(int16_t *)(mem + buf));
 
         case 4:
             R[reg] -= 2;

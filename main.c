@@ -10,6 +10,7 @@ char mem[N_mem];
 int16_t R[7];
 int16_t pc;
 
+
 int main(int argc, char * argv[])
 {
 //************LOADING INFORMATION**********
