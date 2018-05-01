@@ -93,7 +93,8 @@ enum exec_command_status
     EXEC_EXIT
 };
 
-int16_t * exec(int16_t operand, int16_t * R, char* mem, int16_t *pc);
+int16_t* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
+void operandTObyte(int16_t* op);
 
 
 int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw);

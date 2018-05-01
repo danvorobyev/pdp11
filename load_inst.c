@@ -5,9 +5,9 @@
 #define N_mem 20000
 
 extern char mem[N_mem];
-extern int16_t pc;
+extern int16_t R;
 
-int load_inst (char * file)
+int load_inst (char* file, int16_t* R)
 {
     FILE *f = NULL;
 
@@ -34,7 +34,7 @@ int load_inst (char * file)
             //printf("%02x\n", mem[i] & 0xff);
         }
     }
-    pc = (int16_t )(start);
+    R[7] = (int16_t )(start);
     //printf("pc = %o", pc);
     fclose(f);
 

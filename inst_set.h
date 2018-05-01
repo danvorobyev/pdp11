@@ -34,7 +34,7 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
     int16_t sign_sum = ((*op2) >> 15) & (int16_t)0x1;
 
     *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*op2 = 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ 0x1) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
     *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ 0x1) == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 
@@ -48,7 +48,7 @@ inline void  mov_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
     *pc += 2;
 
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*op1 = 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (*psw & V_to_zero);
 }
 
@@ -63,6 +63,13 @@ inline void clr_op(int16_t* op1, int16_t* pc, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
+inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
+{
+
+    *op2 = *op1;
+    *pc += 2;
+
+}
 
 //*************************** BRANCH *****************************
 
