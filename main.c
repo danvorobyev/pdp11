@@ -14,7 +14,7 @@ int16_t psw;
 
 int main(int argc, char * argv[])
 {
-    scanf("%d", (int*)&psw);
+
 //************LOADING INFORMATION**********
     if (load_inst(argv[1]) != EXIT_SUCCESS)
         return EXIT_FAILURE;
@@ -30,6 +30,21 @@ int main(int argc, char * argv[])
     for(int i = 0; i < 7; i++)
         printf("R[%d] = %o\n",i, R[i]);
     printf("pc = %o\n", pc);
+    
+//    int16_t op1 = -32768;
+//    int16_t op2 = -1;
+//
+//
+//    int16_t sign_op1 = ((op1) >> 15) & (int16_t)0x1;
+//    int16_t sign_op2 = ((op2) >> 15) & (int16_t)0x1;
+//
+//    op2 = op1 + op2;
+//
+//    int16_t sign_sum = ((op2) >> 15) & (int16_t)0x1;
+//
+//    printf("sign_op1 = %x; sign_op2 = %x; sign_sum = %x; \n", sign_op1, sign_op2, sign_sum);
+//
+//    printf("%x\n",(sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ 0x1);
 
     return 0;
 
