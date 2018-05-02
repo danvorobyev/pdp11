@@ -15,10 +15,13 @@ int16_t psw;
 int main(int argc, char * argv[])
 {
 
-//************LOADING INFORMATION**********
+//************LOADING INFORMATION*************
+
     if (load_inst(argv[1], &R) != EXIT_SUCCESS)
         return EXIT_FAILURE;
-//******DECODE AND EXECUTE OPERATIONS******
+
+//******DECODE AND EXECUTE OPERATIONS*********
+
     printf("\n---------------- running --------------\n");
     while (1)
     {
@@ -26,7 +29,9 @@ int main(int argc, char * argv[])
         if (op_status == EXEC_EXIT)
             break;
     }
-//**********PRINTING REGISTERS**************
+
+//**********PRINTING REGISTERS****************
+
     printf("r0 = %06o r2 = %06o r4 = %06o sp = %06o\n", R[0], R[2], R[4], R[6]);
     printf("r1 = %06o r3 = %06o r5 = %06o pc = %06o\n", R[1], R[3], R[5], R[7]);
 

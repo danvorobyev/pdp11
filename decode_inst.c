@@ -69,7 +69,6 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     int16_t* op1;
     int16_t* op2;
 
-
     int16_t ss =(int16_t)(slice(inst, 6, 6));
     int16_t dd =(int16_t)(slice(inst, 0, 6));
 
@@ -120,14 +119,12 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op1= exec(ss, R, mem, pc, BYTE);
             printf(",");
             op2 = exec(dd, R, mem, pc, BYTE);
-            printf("\n\nop1 = %o\n", *op1);
-            printf("\nop2 = %o\n", *op2);
             operandTObyte(op1);
-            printf("\nop1 = %o\n", *op1);
             movb_op(op1, op2, pc, psw);
+            printf("\n");
+            return EXEC_OK;
         case SUB:
             printf("%o: SUB", *pc);
-            return EXEC_OK;
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -236,6 +233,9 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case ASL:
             printf("%o: ASL", *pc);
+            return EXEC_OK;
+        case ASLb:
+            printf("%o: ASLb", *pc);
             return EXEC_OK;
         case ASR:
             printf("%o: ASR", *pc);
