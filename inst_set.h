@@ -65,10 +65,8 @@ inline void clr_op(int16_t* op1, int16_t* pc, int16_t* psw)
 
 inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 {
-
     *op2 = *op1;
     *pc += 2;
-
 }
 
 //*************************** BRANCH *****************************
