@@ -66,20 +66,20 @@ inline void dec_op(int16_t* op1, int16_t* pc, int16_t* psw)
 
 inline void adc_op(int16_t* op1, int16_t* pc, int16_t* psw)
 {
-    *psw = (*op1 == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = ((*op1 == 0177777) && ((*psw & C_mask) == 1))? (*psw | C_mask) : (*psw & C_to_zero);
+    int16_t buf = *op1;
 
     *op1 += ((*psw & C_mask) == 0) ? 0 : 1;
     *pc += 2;
 
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (buf == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((buf == 0177777) && ((*psw & C_mask) == 1))? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
 inline void sbc_op(int16_t* op1, int16_t* pc, int16_t* psw)
 {
-    *psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = ((*op1 == 000000) && ((*psw & C_mask) == 1))?  (*psw & C_to_zero) : (*psw | C_mask);
+    int16_t buf = *op1;
 
     *op1 -= ((*psw & C_mask) == 0) ? 0 : 1;
     *pc += 2;
@@ -87,6 +87,18 @@ inline void sbc_op(int16_t* op1, int16_t* pc, int16_t* psw)
 
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (buf == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((buf == 000000) && ((*psw & C_mask) == 1))?  (*psw & C_to_zero) : (*psw | C_mask);
+}
+
+inline void neg_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *op1 = ~(*op1) + (int16_t)1;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*op1 == 0100000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (*op1 == 0) ?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
 
