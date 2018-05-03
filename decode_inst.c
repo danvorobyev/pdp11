@@ -40,9 +40,6 @@ int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case RESET:
             printf("%o: RESET", *pc);
             return EXEC_OK;
-        case RETURN:
-            printf("%o: RETURN", *pc);
-            return EXEC_OK;
         case SCC:
             printf("%o: SCC", *pc);
             return EXEC_OK;
@@ -170,7 +167,6 @@ int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 {
     int opcode = D_type & inst;
     int16_t offset = (int16_t)(int8_t)(inst & 0xFF);
-    printf("%d\n", offset);
     switch(opcode)
     {
         case BCC:
@@ -280,9 +276,6 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case ASRb:
             printf("%o: ASRb", *pc);
-            return EXEC_OK;
-        case CALL:
-            printf("%o: CALL", *pc);
             return EXEC_OK;
         case CLR:
             printf("%o: CLR     ", *pc);
