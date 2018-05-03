@@ -40,6 +40,56 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 
 }
 
+inline void inc_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *psw = (*op1 == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);
+
+    *op1 += 1;
+    *pc += 2;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+
+}
+
+inline void dec_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
+
+    *op1 -= 1;
+    *pc += 2;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+
+}
+
+inline void adc_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *psw = (*op1 == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((*op1 == 0177777) && ((*psw & C_mask) == 1))? (*psw | C_mask) : (*psw & C_to_zero);
+
+    *op1 += ((*psw & C_mask) == 0) ? 0 : 1;
+    *pc += 2;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+}
+
+inline void sbc_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((*op1 == 000000) && ((*psw & C_mask) == 1))?  (*psw & C_to_zero) : (*psw | C_mask);
+
+    *op1 -= ((*psw & C_mask) == 0) ? 0 : 1;
+    *pc += 2;
+
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+}
+
+
 
 //************************ STORE AND LOAD ************************
 
@@ -66,8 +116,10 @@ inline void clr_op(int16_t* op1, int16_t* pc, int16_t* psw)
 
 inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 {
+
     *op2 = *op1;
     *pc += 2;
+
 }
 
 //*************************** BRANCH *****************************
@@ -168,7 +220,16 @@ inline void bvs_op(int16_t * offset, int16_t* pc, int16_t* psw) // V = 1
     *pc += ((((*psw & V_mask) >> 1) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
 }
 
+//*************************** TEST *****************************
 
+inline void tst_op(int16_t* op1, int16_t* pc, int16_t* psw)
+{
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
+    *psw = (*psw & C_to_zero);
 
+    *pc += 2;
+}
 
 #endif //PDP11_INST_SET_H

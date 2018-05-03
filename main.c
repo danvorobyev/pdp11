@@ -36,5 +36,4 @@ int main(int argc, char * argv[])
     printf("r1 = %06o r3 = %06o r5 = %06o pc = %06o\n", R[1], R[3], R[5], R[7]);
 
     return 0;
-
 }
