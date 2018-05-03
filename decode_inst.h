@@ -3,6 +3,15 @@
 
 #define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
 
+enum masks
+{
+    B_type = 0xF000,
+    C_type = 0xFE00,
+    D_type = 0xFF00,
+    E_type = 0xFFC0,
+    F_type = 0xFFF8
+};
+
 enum opcode
 {
     ADC    = 055,
@@ -95,7 +104,6 @@ enum exec_command_status
 };
 
 char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
-void operandTObyte(int16_t* op);
 
 
 int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw);

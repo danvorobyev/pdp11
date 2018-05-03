@@ -34,7 +34,10 @@ int main(int argc, char * argv[])
 
     printf("r0 = %06o r2 = %06o r4 = %06o sp = %06o\n", R[0], R[2], R[4], R[6]);
     printf("r1 = %06o r3 = %06o r5 = %06o pc = %06o\n", R[1], R[3], R[5], R[7]);
+    printf("\npsw = %o", psw);
 
+//    int8_t kek = -6;
+//    printf("%d\n", (int16_t)kek);
     return 0;
 
 

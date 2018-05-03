@@ -11,7 +11,7 @@
 
 int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 16
 {
-    int opcode = slice(inst, 0, 16);
+    int opcode = inst;
     switch(opcode)
     {
         case CCC:
@@ -65,7 +65,7 @@ int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 4, command = 12
 {
-    int opcode = slice(inst, 12, 4);
+    int opcode = B_type & inst;
     int16_t* op1;
     int16_t* op2;
     int8_t* op3;
@@ -136,7 +136,7 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 7, command = 9
 {
-    int opcode = slice(inst, 9, 7);
+    int opcode = C_type & inst;
     int16_t op1;
     int16_t op2;
     switch(opcode)
@@ -168,8 +168,9 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 8, command = 8
 {
-    int opcode = slice(inst, 8, 8);
-    int16_t offset = (int16_t)(slice(inst, 0, 8));
+    int opcode = D_type & inst;
+    int16_t offset = (int16_t)(int8_t)(inst & 0xFF);
+    printf("%d\n", offset);
     switch(opcode)
     {
         case BCC:
@@ -254,7 +255,7 @@ int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 10, command = 6
 {
-    int opcode = slice(inst, 6, 10);
+    int opcode = E_type & inst;
     int16_t* op;
     int16_t dd =(int16_t)(slice(inst, 0, 6));
     switch(opcode)
@@ -368,7 +369,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw)// opcode = 13, command = 3
 {
-    int opcode = slice(inst, 3, 13);
+    int opcode = F_type & inst;
     int16_t* op1;
     int16_t dd =(int16_t)(slice(inst, 0, 3));
     switch(opcode)

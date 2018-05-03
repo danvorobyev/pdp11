@@ -133,6 +133,10 @@ inline void movb_op(int8_t* op1, char* op2, int16_t* pc, int16_t* psw, int mode)
     else
         *(int8_t*)op2 = *op1;
     *pc += 2;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
 }
 
 //*************************** BRANCH *****************************
@@ -140,97 +144,111 @@ inline void movb_op(int8_t* op1, char* op2, int16_t* pc, int16_t* psw, int mode)
 inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 {
     int16_t buf = ((*op2) << 1);
-
-    if(*op1 != 1)
-    {
+    *op1 -= 1;
+    if(*op1 != 0)
         *pc -= buf;
-        *op1 -= 1;
-    }
     *pc += 2;
 }
 
-inline void bcc_op(int16_t* offset, int16_t* pc, int16_t* psw) //C = 0
+inline void bcc_op(int16_t * offset, int16_t* pc, int16_t* psw) //C = 0
 {
-    *pc += (((*psw & C_mask) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += (((*psw & C_mask) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bcs_op(int16_t * offset, int16_t* pc, int16_t* psw) //C = 1
 {
-    *pc += (((*psw & C_mask) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += (((*psw & C_mask) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void beq_op(int16_t * offset, int16_t* pc, int16_t* psw) //Z = 1
 {
-    *pc += ((((*psw & Z_mask) >> 2) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & Z_mask) >> 2) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bge_op(int16_t * offset, int16_t* pc, int16_t* psw) // N ^ V = 0
 {
-    *pc += (((((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += (((((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bgt_op(int16_t * offset, int16_t* pc, int16_t* psw) // Z * (N ^ V) = 0
 {
-    *pc += ((((*psw & Z_mask) >> 2) & (((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & Z_mask) >> 2) & (((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bhi_op(int16_t * offset, int16_t* pc, int16_t* psw) // C * Z = 0
 {
-    *pc += ((((*psw & C_mask) ^ ((*psw & Z_mask) >> 2)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & C_mask) ^ ((*psw & Z_mask) >> 2)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bhis_op(int16_t * offset, int16_t* pc, int16_t* psw) // C = 0
 {
-    *pc += (((*psw & C_mask) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += (((*psw & C_mask) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void ble_op(int16_t * offset, int16_t* pc, int16_t* psw) // Z * (N ^ V) = 1
 {
-    *pc += ((((*psw & Z_mask) >> 2) & (((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2; // Z * (N ^ V) = 1
+    *pc += ((((*psw & Z_mask) >> 2) & (((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0; // Z * (N ^ V) = 1
+    *pc += 2;
 }
 
 inline void blo_op(int16_t * offset, int16_t* pc, int16_t* psw) // C = 1
 {
-    *pc += (((*psw & C_mask) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += (((*psw & C_mask) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 inline void blos_op(int16_t * offset, int16_t* pc, int16_t* psw) // C * Z = 1
 {
-    *pc += ((((*psw & C_mask) ^ ((*psw & Z_mask) >> 2)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & C_mask) ^ ((*psw & Z_mask) >> 2)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void blt_op(int16_t * offset, int16_t* pc, int16_t* psw) // N ^ V = 1
 {
-    *pc += (((((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += (((((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bmi_op(int16_t * offset, int16_t* pc, int16_t* psw) // N = 1
 {
-    *pc += ((((*psw & N_mask) >> 3) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & N_mask) >> 3) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bne_op(int16_t * offset, int16_t* pc, int16_t* psw) // Z = 0
 {
-    *pc += ((((*psw & Z_mask) >> 2) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & Z_mask) >> 2) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bpl_op(int16_t * offset, int16_t* pc, int16_t* psw) // N = 0
 {
-    *pc += ((((*psw & N_mask) >> 3) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & N_mask) >> 3) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void br_op(int16_t * offset, int16_t* pc, int16_t* psw) // Unconditional
 {
-    *pc += ((*offset) << 2);
+    *pc += ((*offset) << 1);
+    *pc += 2;
 }
 
 inline void bvc_op(int16_t * offset, int16_t* pc, int16_t* psw) // V = 0
 {
-    *pc += ((((*psw & V_mask) >> 1) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & V_mask) >> 1) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 inline void bvs_op(int16_t * offset, int16_t* pc, int16_t* psw) // V = 1
 {
-    *pc += ((((*psw & V_mask) >> 1) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 2;
+    *pc += ((((*psw & V_mask) >> 1) & (int16_t)0x1) == 1) ? ((*offset) << 1) : 0;
+    *pc += 2;
 }
 
 //*************************** TEST *****************************
