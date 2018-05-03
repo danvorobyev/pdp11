@@ -126,12 +126,13 @@ inline void clr_op(int16_t* op1, int16_t* pc, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
-inline void movb_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
+inline void movb_op(int8_t* op1, char* op2, int16_t* pc, int16_t* psw, int mode)
 {
-
-    *op2 = *op1;
+    if(mode == 0)
+        *(int16_t*)op2 = *op1;
+    else
+        *(int8_t*)op2 = *op1;
     *pc += 2;
-
 }
 
 //*************************** BRANCH *****************************

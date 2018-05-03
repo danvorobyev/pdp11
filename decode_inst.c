@@ -68,6 +68,9 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     int opcode = slice(inst, 12, 4);
     int16_t* op1;
     int16_t* op2;
+    int8_t* op3;
+    char* op4;
+    int mode;
 
     int16_t ss =(int16_t)(slice(inst, 6, 6));
     int16_t dd =(int16_t)(slice(inst, 0, 6));
@@ -76,9 +79,9 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     {
         case ADD:
             printf("%o: ADD     ", *pc);
-            op1 = exec(ss, R, mem, pc, WORD);
+            op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
-            op2 = exec(dd, R, mem, pc, WORD);
+            op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
             printf("\n");
             add_op(op1, op2, pc, psw);
             return EXEC_OK;
@@ -108,19 +111,19 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case MOV:
             printf("%o: MOV     ", *pc);
-            op1 = exec(ss, R, mem, pc, WORD);
+            op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
-            op2 = exec(dd, R, mem, pc, WORD);
+            op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
             printf("\n");
             mov_op(op1, op2, pc, psw);
             return EXEC_OK;
         case MOVb:
             printf("%o: MOVb    ", *pc);
-            op1= exec(ss, R, mem, pc, BYTE);
+            op3= (int8_t*)exec(ss, R, mem, pc, BYTE);
             printf(",");
-            op2 = exec(dd, R, mem, pc, BYTE);
-            operandTObyte(op1);
-            movb_op(op1, op2, pc, psw);
+            op4 = exec(dd, R, mem, pc, BYTE);
+            mode = slice(inst, 3, 3);
+            movb_op(op3, op4, pc, psw, mode);
             printf("\n");
             return EXEC_OK;
         case SUB:
@@ -258,7 +261,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     {
         case ADC:
             printf("%o: ADC", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             adc_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -282,7 +285,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case CLR:
             printf("%o: CLR     ", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             clr_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -297,7 +300,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case DEC:
             printf("%o: DEC     ", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             dec_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -306,7 +309,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case INC:
             printf("%o: INC", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             inc_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -336,7 +339,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case SBC:
             printf("%o: SBC", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             sbc_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -351,7 +354,7 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case TST:
             printf("%o: TST", *pc);
-            op = exec(dd, R, mem, pc, WORD);
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             tst_op(op, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -388,7 +391,9 @@ void operandTObyte(int16_t* op)
 }
 
 
-int16_t* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
+
+
+char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
 {
 
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
@@ -398,45 +403,44 @@ int16_t* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORwo
     {
         case 0:
             printf("r%o", reg);
-            return &R[reg];
+            return (char*)(R+reg);
 
         case 1:
             printf("(r)%o", reg);
-            return (int16_t *)(mem + R[reg]);
+            return mem + R[reg];
 
         case 2:
             if (reg == 7)
             {
                 *pc += 2;
                 printf("#%06o", *(int16_t *)(mem + *pc));
-                return (int16_t *)(mem + *pc);
+                return mem + *pc;
             }
             printf("(r%o)+", reg);
             buf = R[reg];
             R[reg] += 1 + byteORword;
-            if (byteORword == BYTE)
-                return (int16_t *)(mem + buf);
+            return mem + buf;
         case 3:
             if (reg == 7)
             {
                 *pc += 2;
                 printf("#%06o",*(int16_t *)(mem + *(int16_t *)(mem + *pc)));
-                return (int16_t *)(mem + *(int16_t *)(mem + *pc));
+                return mem + *(int16_t *)(mem + *pc);
             }
             printf("@(r%o)+", reg);
             buf = R[reg];
             R[reg] += 2;
-            return (int16_t *)(mem + *(int16_t *)(mem + buf));
+            return mem + *(int16_t *)(mem + buf);
 
         case 4:
             printf("-(r%o)", reg);
             R[reg] -= 1 + byteORword;
-            return (int16_t *)(mem + R[reg]);
+            return mem + R[reg];
 
         case 5:
             printf("@-(r%o)", reg);
             R[reg] -= 2;
-            return (int16_t *)(mem + *(int16_t *)(mem + R[reg]));
+            return mem + *(int16_t *)(mem + R[reg]);
 
         case 6:
             return NULL;
@@ -454,7 +458,8 @@ int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw)
     int16_t inst = *(int16_t*)(mem + *pc); // for 16bit instructions
     int ret_status;
 
-    while(1){
+    while(1)
+    {
 
         ret_status = decode_A_type(inst, R, mem, pc, psw);
         if(ret_status == EXEC_OK)
@@ -475,7 +480,6 @@ int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw)
         if(ret_status == EXEC_OK)
             break;
         break;
-
     }
 
     return ret_status;
