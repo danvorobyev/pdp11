@@ -34,7 +34,7 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* psw)
 
     *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = ((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1)  == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ 0x1) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
     *psw = (sign_op2 & sign_sum == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
