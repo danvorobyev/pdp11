@@ -375,18 +375,6 @@ int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     }
 }
 
-
-void operandTObyte(int16_t* op)
-{
-    int16_t buf = *op & (int16_t)0xFF;
-    if(buf >> 7 == 1)
-        buf = (int16_t)0xFF00 | buf;
-    *op = buf;
-}
-
-
-
-
 char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
 {
 
@@ -478,5 +466,3 @@ int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw)
 
     return ret_status;
 }
-
-
