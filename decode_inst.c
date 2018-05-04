@@ -79,8 +79,9 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
             op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            *pc += 2;
             printf("\n");
-            add_op(op1, op2, pc, psw);
+            add_op(op1, op2, psw);
             return EXEC_OK;
         case BIC:
             printf("%o: BIC", *pc);
@@ -111,16 +112,18 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
             op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            *pc += 2;
             printf("\n");
-            mov_op(op1, op2, pc, psw);
+            mov_op(op1, op2, psw);
             return EXEC_OK;
         case MOVb:
             printf("%o: MOVb    ", *pc);
             op3= (int8_t*)exec(ss, R, mem, pc, BYTE);
             printf(",");
             op4 = exec(dd, R, mem, pc, BYTE);
+            *pc += 2;
             mode = slice(inst, 3, 3);
-            movb_op(op3, op4, pc, psw, mode);
+            movb_op(op3, op4, psw, mode);
             printf("\n");
             return EXEC_OK;
         case SUB:
@@ -151,6 +154,7 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: SOB     ", *pc);
             op1 = (int16_t)(slice(inst, 6, 3));
             op2 = (int16_t)(slice(inst, 0, 6));
+            *pc += 2;
             printf ("r%o,%06o", op1, *pc + 2 - (op2 << 1));
             printf("\n");
             sob_op(&R[op1], &op2, pc, psw);
@@ -171,76 +175,91 @@ int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     {
         case BCC:
             printf("%o: BCC", *pc);
+            *pc += 2;
             bcc_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BCS:
             printf("%o: BCS", *pc);
+            *pc += 2;
             bcs_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BEQ:
             printf("%o: BEQ", *pc);
+            *pc += 2;
             beq_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BGE:
             printf("%o: BGE", *pc);
+            *pc += 2;
             bge_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BGT:
             printf("%o: BGT", *pc);
+            *pc += 2;
             bgt_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BHI:
             printf("%o: BHI", *pc);
+            *pc += 2;
             bhi_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BLE:
             printf("%o: BLE", *pc);
+            *pc += 2;
             ble_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BLT:
             printf("%o: BLT", *pc);
+            *pc += 2;
             blt_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BLOS:
             printf("%o: BLOS", *pc);
+            *pc += 2;
             blos_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BMI:
             printf("%o: BMI", *pc);
+            *pc += 2;
             bmi_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BNE:
             printf("%o: BNE", *pc);
+            *pc += 2;
             bne_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BPL:
             printf("%o: BPL", *pc);
+            *pc += 2;
             bpl_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BR:
             printf("%o: BR", *pc);
+            *pc += 2;
             br_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BVC:
             printf("%o: BVC", *pc);
+            *pc += 2;
             bvc_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
         case BVS:
             printf("%o: BVS", *pc);
+            *pc += 2;
             bvs_op(&offset, pc, psw);
             printf("\n");
             return EXEC_OK;
@@ -259,7 +278,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case ADC:
             printf("%o: ADC", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            adc_op(op, pc, psw);
+            *pc += 2;
+            adc_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case ADCb:
@@ -280,7 +300,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case CLR:
             printf("%o: CLR     ", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            clr_op(op, pc, psw);
+            *pc += 2;
+            clr_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case CLRb:
@@ -295,7 +316,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case DEC:
             printf("%o: DEC     ", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            dec_op(op, pc, psw);
+            *pc += 2;
+            dec_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case DECb:
@@ -304,7 +326,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case INC:
             printf("%o: INC", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            inc_op(op, pc, psw);
+            *pc += 2;
+            inc_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case INCb:
@@ -334,7 +357,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case SBC:
             printf("%o: SBC", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            sbc_op(op, pc, psw);
+            *pc += 2;
+            sbc_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case SBCb:
@@ -349,7 +373,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case TST:
             printf("%o: TST", *pc);
             op = (int16_t*)exec(dd, R, mem, pc, WORD);
-            tst_op(op, pc, psw);
+            *pc += 2;
+            tst_op(op, psw);
             printf("\n");
             return EXEC_OK;
         case TSTb:
