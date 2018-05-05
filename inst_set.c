@@ -8,7 +8,7 @@ extern void  sbc_op(int16_t* op1, int16_t* psw);
 extern void  neg_op(int16_t* op1, int16_t* psw);
 
 extern void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw);
-extern void  movb_op(int8_t* op1, char* op2, int16_t* psw, int mode);
+extern void  movb_op(char* op1, char* op2, int16_t* psw, int mode);
 extern void  clr_op(int16_t* op1, int16_t* psw);
 
 extern void  sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw);
@@ -29,7 +29,7 @@ extern void  bvc_op(int16_t * offset, int16_t* pc, int16_t* psw);
 extern void  bvs_op(int16_t * offset, int16_t* pc, int16_t* psw);
 
 extern void  tst_op(int16_t* op1, int16_t* psw);
-extern void tstb_op(char* op1, int16_t* psw);
+extern void  tstb_op(int8_t * op1, int16_t* psw);
 
 
 //TODO: beq_op, br_op, tstb_op;

@@ -117,15 +117,15 @@ inline void clr_op(int16_t* op1, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
-inline void movb_op(int8_t* op1, char* op2, int16_t* psw, int mode)
+inline void movb_op(char* op1, char* op2, int16_t* psw, int mode)
 {
     if(mode == 0)
-        *(int16_t*)op2 = *op1;
+        *(int16_t*)op2 = *(int8_t*)(op1);
     else
-        *(int8_t*)op2 = *op1;
+        *(int8_t*)op2 = *(int8_t*)(op1);
 
-    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*(int8_t*)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*(int8_t*)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (*psw & V_to_zero);
 }
 
@@ -233,10 +233,10 @@ inline void tst_op(int16_t* op1, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
-inline void tstb_op(char* op1, int16_t* psw)
+inline void tstb_op(int8_t * op1, int16_t* psw)
 {
-    *psw = (*(int8_t *)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*(int8_t *)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (*psw & V_to_zero);
     *psw = (*psw & C_to_zero);
 }
