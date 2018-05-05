@@ -129,7 +129,7 @@ inline void movb_op(char* op1, char* op2, int16_t* psw, int mode)
     *psw = (*psw & V_to_zero);
 }
 
-//*************************** BRANCH *****************************
+//*************************** JUMP *****************************
 
 inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 {
@@ -138,6 +138,22 @@ inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
     if(*op1 != 0)
         *pc -= buf;
 }
+
+inline void jsr_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* R)
+{
+    R[6] = R[*op1];
+    R[*op1] = *pc;
+    *pc = *op2;
+}
+
+inline void rts_op(int16_t* op1, int16_t* pc, int16_t* R)
+{
+    *pc = *op1;
+    *op1 = R[6];
+    R[6] += 2;
+}
+
+//*************************** BRANCH *****************************
 
 inline void bcc_op(int16_t * offset, int16_t* pc, int16_t* psw) //C = 0
 {
