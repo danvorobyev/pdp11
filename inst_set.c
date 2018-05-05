@@ -29,7 +29,7 @@ extern void  bvc_op(int16_t * offset, int16_t* pc, int16_t* psw);
 extern void  bvs_op(int16_t * offset, int16_t* pc, int16_t* psw);
 
 extern void  tst_op(int16_t* op1, int16_t* psw);
-extern void  tstb_op(int16_t* op1, int16_t* psw);
+extern void tstb_op(char* op1, int16_t* psw);
 
 
 //TODO: beq_op, br_op, tstb_op;

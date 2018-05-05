@@ -233,8 +233,11 @@ inline void tst_op(int16_t* op1, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
-inline void tstb_op(int16_t* op1, int16_t* psw)
+inline void tstb_op(char* op1, int16_t* psw)
 {
-
+    *psw = (*(int8_t *)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*(int8_t *)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
+    *psw = (*psw & C_to_zero);
 }
 #endif //PDP11_INST_SET_H

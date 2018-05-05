@@ -379,6 +379,10 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case TSTb:
             printf("%o: TSTb", *pc);
+            op = (*)exec(dd, R, mem, pc, WORD);
+            *pc += 2;
+            tst_op(op, psw);
+            printf("\n");
             return EXEC_OK;
         default:
             return EXEC_EXIT;
