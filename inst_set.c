@@ -39,4 +39,4 @@ extern void  tst_op(int16_t* op1, int16_t* psw);
 extern void  tstb_op(int8_t * op1, int16_t* psw);
 
 
-//TODO: sub, jmp, cmp
+//TODO: cmp

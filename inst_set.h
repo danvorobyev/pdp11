@@ -191,6 +191,11 @@ inline void jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R, char* mem
     *pc = *op2;
 }
 
+inline void jmp_op(int16_t* op1, int16_t* pc)
+{
+    *pc = *op1;
+}
+
 inline void rts_op(int16_t* op1, int16_t* pc, int16_t* R, char* mem)
 {
     *pc = R[*op1];
