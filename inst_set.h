@@ -96,6 +96,7 @@ inline void neg_op(int16_t* op1, int16_t* psw)
 
 inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
 {
+    /////////////
     int32_t res = R[op1] * (*op2);
 
     if(op1 % 2 == 0){
