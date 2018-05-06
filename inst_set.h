@@ -140,6 +140,32 @@ inline void div_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw) {
     *psw = (*op2 == 0) ?  (*psw | C_mask) : (*psw & C_to_zero);
 }
 
+inline void cmp_op(int16_t* op1, int16_t* op2, int16_t* psw)
+{
+    int16_t sign_op1 = ((*op1) >> 15) & (int16_t)0x1;
+    int16_t sign_op2 = ((*op2) >> 15) & (int16_t)0x1;
+
+    int16_t buf = *op1 + (~(*op2) + (int16_t)1);
+
+    int16_t sign_buf = ((*op2) >> 15) & (int16_t)0x1;
+
+    *psw = (buf < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (buf == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = ((sign_op1 ^ sign_op2) & (sign_op1 ^ sign_buf) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (sign_op1 & sign_buf == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
+}
+
+inline void asr_op(int16_t* op1, int16_t* psw)
+{
+    int c = *op1 & 1;
+    *op1 = *op1 >> 1;
+
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (c == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
+    *psw = ((*psw >> 3)^ *psw) ? (*psw | V_mask) : (*psw & V_to_zero);
+}
+
 inline void asl_op(int16_t* op1, int16_t* psw)
 {
     *psw = (((*op1 >> 15) & (int16_t)0x1) | *psw); // for C
@@ -183,8 +209,6 @@ inline void movb_op(char* op1, char* op2, int16_t* psw, int mode)
     *psw = (*(int8_t*)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = *psw & V_to_zero;
 }
-
-
 
 //*************************** JUMP *****************************
 
@@ -319,20 +343,4 @@ inline void tstb_op(int8_t * op1, int16_t* psw)
     *psw = (*psw & V_to_zero);
     *psw = (*psw & C_to_zero);
 }
-
-inline void cmp_op(int16_t* op1, int16_t* op2, int16_t* psw)
-{
-    int16_t sign_op1 = ((*op1) >> 15) & (int16_t)0x1;
-    int16_t sign_op2 = ((*op2) >> 15) & (int16_t)0x1;
-
-    int16_t buf = *op1 + (~(*op2) + (int16_t)1);
-
-    int16_t sign_buf = ((*op2) >> 15) & (int16_t)0x1;
-
-    *psw = (buf < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (buf == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = ((sign_op1 ^ sign_op2) & (sign_op1 ^ sign_buf) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = (sign_op1 & sign_buf == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
-}
-
 #endif //PDP11_INST_SET_H

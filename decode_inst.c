@@ -85,6 +85,8 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case BIC:
             printf("%o: BIC", *pc);
+            *pc += 2;
+
             return EXEC_OK;
         case BICb:
             printf("%o: BICb", *pc);
@@ -102,7 +104,13 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: BITb", *pc);
             return EXEC_OK;
         case CMP:
-            printf("%o: CMP", *pc);
+            printf("%o: CMP     ", *pc);
+            *pc += 2;
+            op1 = (int16_t *)exec(ss, R, mem, pc, WORD);
+            printf(",");
+            op2 = (int16_t *)exec(ss, R, mem, pc, WORD);
+            cmp_op(op1, op2, psw);
+            printf("\n");
             return EXEC_OK;
         case CMPb:
             printf("%o: CMPb", *pc);
@@ -113,8 +121,8 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
             op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
-            printf("\n");
             mov_op(op1, op2, psw);
+            printf("\n");
             return EXEC_OK;
         case MOVb:
             printf("%o: MOVb    ", *pc);
@@ -132,6 +140,12 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case SUB:
             printf("%o: SUB", *pc);
+            *pc += 2;
+            op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
+            printf(",");
+            op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            sub_op(op1, op2, psw);
+            printf("\n");
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -369,7 +383,11 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: INCb", *pc);
             return EXEC_OK;
         case JMP:
-            printf("%o: JMP", *pc);
+            printf("%o: JMP     ", *pc);
+            *pc += 2;
+            op = (int16_t*)execjump(dd, R, mem, pc);
+            jmp_op(op, pc);
+            printf("\n");
             return EXEC_OK;
         case NEG:
             printf("%o: NEG", *pc);
@@ -521,8 +539,8 @@ char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
             if (reg == 7)
             {
                 *pc += 2;
-                printf("%06o", *pc - 2 + *(uint16_t*)(mem + *pc - 2));
-                abc[0] = *pc - 2 + *(uint16_t*)(mem + *pc - 2);
+                printf("%06o", *pc  + *(uint16_t*)(mem + *pc - 2));
+                abc[0] = *pc + *(uint16_t*)(mem + *pc - 2);
                 return (char*)(abc + 0);
             }
             *pc += 2;
