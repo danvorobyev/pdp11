@@ -171,10 +171,16 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             sob_op(&R[op1], &op2, pc, psw);
             return EXEC_OK;
         case XOR:
-            printf("%o: XOR", *pc);
+            printf("%o: XOR     ", *pc);
             return EXEC_OK;
         case MUL:
-            printf("%o: MUL", *pc);
+            printf("%o: MUL     ", *pc);
+            op1 = (int16_t)(slice(inst, 6, 3));
+            printf("r%o,", op1);
+            *pc += 2;
+            op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            mul_op(op1, op3, R, psw);
+            printf("\n");
             return EXEC_OK;
         default:
             return EXEC_EXIT;

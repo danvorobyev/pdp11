@@ -94,7 +94,7 @@ inline void neg_op(int16_t* op1, int16_t* psw)
     *psw = (*op1 == 0) ?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
-inline void mul(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
+inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
 {
     int32_t res = R[op1] * (*op2);
 

@@ -6,7 +6,7 @@ extern void  dec_op(int16_t* op1, int16_t* psw);
 extern void  adc_op(int16_t* op1, int16_t* psw);
 extern void  sbc_op(int16_t* op1, int16_t* psw);
 extern void  neg_op(int16_t* op1, int16_t* psw);
-extern void  mul(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw);
+extern void  mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw);
 
 
 extern void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw);
