@@ -34,7 +34,7 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* psw)
 
     *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ 0x1) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ (0x1)) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
     *psw = (sign_op2 & sign_sum == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
@@ -126,7 +126,7 @@ inline void movb_op(char* op1, char* op2, int16_t* psw, int mode)
 
     *psw = (*(int8_t*)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*(int8_t*)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (*psw & V_to_zero);
+    *psw = *psw & V_to_zero;
 }
 
 //*************************** JUMP *****************************
@@ -139,17 +139,17 @@ inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
         *pc -= buf;
 }
 
-inline void jsr_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* R)
+inline void jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R)
 {
-    R[6] = R[*op1];
-    R[*op1] = *pc;
+    R[6] = R[op1];
+    R[op1] = *pc;
     *pc = *op2;
 }
 
 inline void rts_op(int16_t* op1, int16_t* pc, int16_t* R)
 {
-    *pc = *op1;
-    *op1 = R[6];
+    *pc = R[*op1];
+    R[*op1] = R[6];
     R[6] += 2;
 }
 

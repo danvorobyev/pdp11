@@ -125,8 +125,7 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             mode = slice(inst, 3, 3);
             if (*(uint16_t *)(mem + *pc) == 0177566)
                 printf("  [177566] = %c", *(int8_t*)op3);
-            else
-                movb_op(op3, op4, psw, mode);
+            movb_op(op3, op4, psw, mode);
             *pc += 2;
             printf("\n");
             return EXEC_OK;
@@ -143,6 +142,8 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     int opcode = C_type & inst;
     int16_t op1;
     int16_t op2;
+    int16_t* op3;
+    int16_t dd =(int16_t)(slice(inst, 0, 6));
     switch(opcode)
     {
         case ASH:
@@ -152,12 +153,19 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: ASHC", *pc);
             return EXEC_OK;
         case JSR:
-            printf("%o: JSR", *pc);
+            printf("%o: JSR     ", *pc);
+            op1 = (int16_t)(slice(inst, 6, 3));
+            printf("%06o,", op1);
+            op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf("op");
+            *pc += 2;
+            jsr_op(op1, op3, pc, R);
+            printf("\n");
             return EXEC_OK;
         case SOB:
             printf("%o: SOB     ", *pc);
             op1 = (int16_t)(slice(inst, 6, 3));
-            op2 = (int16_t)(slice(inst, 0, 6));
+            op2 = dd;
             *pc += 2;
             printf ("r%o,%06o", op1, *pc + 2 - (op2 << 1));
             printf("\n");
@@ -397,12 +405,13 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw)// opcode = 13, command = 3
 {
     int opcode = F_type & inst;
-    int16_t* op1;
-    int16_t dd =(int16_t)(slice(inst, 0, 3));
+    int16_t reg =(int16_t)(slice(inst, 0, 3));
     switch(opcode)
     {
         case RTS:
             printf("%o: RTS", *pc);
+            *pc += 2;
+            rts_op(&reg, pc, R);
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -457,7 +466,14 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             R[reg] -= 2;
             return mem + *(uint16_t *)(mem + R[reg]);
         case 6:
-            return NULL;
+            if (reg == 7)
+            {
+                *pc += 2;
+                printf("&06o",* (int16_t*)(mem + *pc));
+            }
+            buf = *(uint16_t *)(mem + *pc + 2);
+            printf("%06o(r%o)", buf, reg);
+            return mem + R[reg] + buf;
         case 7:
             return NULL;
         default:
