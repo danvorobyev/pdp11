@@ -38,6 +38,21 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* psw)
     *psw = (sign_op2 & sign_sum == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
+inline void sub_op(int16_t* op1, int16_t* op2, int16_t* psw)
+{
+    int16_t sign_op1 = ((*op1) >> 15) & (int16_t)0x1;
+    int16_t sign_op2 = ((*op2) >> 15) & (int16_t)0x1;
+
+    *op2 += ~(*op1) + (int16_t)1;
+
+    int16_t sign_sub = ((*op2) >> 15) & (int16_t)0x1;
+
+    *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (((sign_op1 ^ sign_op2) & (sign_op2 ^ sign_sub) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (sign_op2 & sign_sub == 1) ?  (*psw & C_to_zero) : (*psw | C_mask);
+}
+
 inline void inc_op(int16_t* op1, int16_t* psw)
 {
     *psw = (*op1 == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);

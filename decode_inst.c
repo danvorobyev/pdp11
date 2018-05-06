@@ -186,7 +186,7 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_EXIT;
     }
 }
-/////////////
+
 int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 8, command = 8
 {
     int opcode = D_type & inst;
