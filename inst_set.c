@@ -2,6 +2,7 @@
 
 extern void  add_op(int16_t* op1, int16_t* op2, int16_t* psw);
 extern void  inc_op(int16_t* op1, int16_t* psw);
+extern void  incb_op(char* op1, int16_t* psw, int mode);
 extern void  dec_op(int16_t* op1, int16_t* psw);
 extern void  adc_op(int16_t* op1, int16_t* psw);
 extern void  sbc_op(int16_t* op1, int16_t* psw);
@@ -12,7 +13,7 @@ extern void  sub_op(int16_t* op1, int16_t* op2, int16_t* psw);
 extern void  cmp_op(int16_t* op1, int16_t* op2, int16_t* psw);
 extern void  asr_op(int16_t* op1, int16_t* psw);
 extern void  asl_op(int16_t* op1, int16_t* psw);
-
+extern void  bic_op(int16_t* op1, int16_t* op2, int16_t* psw);
 
 extern void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw);
 extern void  movb_op(char* op1, char* op2, int16_t* psw, int mode);
@@ -41,6 +42,3 @@ extern void  bvs_op(int16_t * offset, int16_t* pc, int16_t* psw);
 
 extern void  tst_op(int16_t* op1, int16_t* psw);
 extern void  tstb_op(int8_t * op1, int16_t* psw);
-
-
-//TODO: cmp

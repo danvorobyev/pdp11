@@ -527,6 +527,7 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
 
     }
 }
+
 char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
 {
     int16_t mode = (operand >> 3) & (int16_t)(0x7);

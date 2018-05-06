@@ -64,6 +64,19 @@ inline void inc_op(int16_t* op1, int16_t* psw)
 
 }
 
+inline void incb_op(char* op1, int16_t* psw, int mode)
+{
+    *psw = ((int16_t)(*op1) == 0177) ? (*psw | V_mask) : (*psw & V_to_zero);
+
+    if(mode == 0)
+        *(int16_t*)op1 += 1;
+    else
+        *(int8_t*)op1 += 1;
+
+    *psw = (*(int8_t*)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*(int8_t*)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+}
+
 inline void dec_op(int16_t* op1, int16_t* psw)
 {
     *psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
@@ -175,6 +188,15 @@ inline void asl_op(int16_t* op1, int16_t* psw)
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (*psw | ((((*psw >> 3) & (int16_t)(0x1)) ^ ((*psw >> 2) & (int16_t)(0x1))) << 1));
+}
+
+inline void  bic_op(int16_t* op1, int16_t* op2, int16_t* psw)
+{
+    *op2 = (~(*op1)) & *op2;
+
+    *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
 }
 
 //************************ STORE AND LOAD ************************
