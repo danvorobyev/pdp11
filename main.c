@@ -37,6 +37,4 @@ int main(int argc, char * argv[])
     printf("\npsw = %o", psw);
 
     return 0;
-
-
 }

@@ -94,17 +94,28 @@ inline void neg_op(int16_t* op1, int16_t* psw)
     *psw = (*op1 == 0) ?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
+inline void mul(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
+{
+    int32_t res = R[op1] * (*op2);
 
+    if(op1 % 2 == 0){
+        R[op1] = (int16_t)((res >> 16) & 0xFFFF);
+        R[op1 + 1] = (int16_t)((res) & 0xFFFF);
+    } else{
+        R[op1] = (int16_t)((res) & 0xFFFF);
+    }
+
+    *psw = (res < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (res == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
+    *psw = ((res < -0x8000) || (res > 0x7FFF)) ?  (*psw | C_mask) : (*psw & C_to_zero);
+}
 
 //************************ STORE AND LOAD ************************
 
 inline void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw)
 {
-    *op2 = *op1;
 
-    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (*psw & V_to_zero);
 }
 
 inline void clr_op(int16_t* op1, int16_t* psw)

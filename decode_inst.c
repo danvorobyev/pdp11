@@ -173,6 +173,9 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case XOR:
             printf("%o: XOR", *pc);
             return EXEC_OK;
+        case MUL:
+            printf("%o: MUL", *pc);
+            return EXEC_OK;
         default:
             return EXEC_EXIT;
     }
