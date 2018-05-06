@@ -158,7 +158,7 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("r%o,", op1);
             *pc += 2;
             op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
-            jsr_op(op1, op3, pc, R);
+            jsr_op(op1, op3, pc, R, mem);
             printf("\n");
             return EXEC_OK;
         case SOB:

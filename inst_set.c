@@ -12,7 +12,7 @@ extern void  movb_op(char* op1, char* op2, int16_t* psw, int mode);
 extern void  clr_op(int16_t* op1, int16_t* psw);
 
 extern void  sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw);
-extern void  jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R);
+extern void  jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R, char* mem);
 extern void  rts_op(int16_t* op1, int16_t* pc, int16_t* R, char* mem);
 
 extern void  bcc_op(int16_t* offset, int16_t* pc, int16_t* psw);
