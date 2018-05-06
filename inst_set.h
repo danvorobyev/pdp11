@@ -115,7 +115,11 @@ inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
 
 inline void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw)
 {
+    *op2 = *op1;
 
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*psw & V_to_zero);
 }
 
 inline void clr_op(int16_t* op1, int16_t* psw)
