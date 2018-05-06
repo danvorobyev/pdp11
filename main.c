@@ -32,9 +32,9 @@ int main(int argc, char * argv[])
 
 //**********PRINTING REGISTERS****************
 
-    printf("r0 = %06o r2 = %06o r4 = %06o sp = %06o\n", R[0], (int8_t)R[2], R[4], R[6]);
-    printf("r1 = %06o r3 = %06o r5 = %06o pc = %06o\n", R[1], R[3], R[5], R[7]);
-    printf("\npsw = %o", psw);
+    printf("r0 = %06o r2 = %06o r4 = %06o sp = %06o\n", (uint16_t)R[0], (uint16_t)R[2], (uint16_t)R[4], (uint16_t)R[6]);
+    printf("r1 = %06o r3 = %06o r5 = %06o pc = %06o\n", (uint16_t)R[1], (uint16_t)R[3], (uint16_t)R[5], (uint16_t)R[7]);
+    printf("psw = %06o\n", psw);
 
     return 0;
 }

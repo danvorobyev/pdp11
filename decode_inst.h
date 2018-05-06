@@ -57,6 +57,7 @@ enum opcode
     COMb   = 0105100,
     DEC    = 0005300,
     DECb   = 0105300,
+    DIV    = 0071000,
     HALT   = 0000000,
     INC    = 0005200,
     INCb   = 0105200,
@@ -89,7 +90,6 @@ enum opcode
     TSTb   = 0105700,
     XOR    = 0074000
 };
-/////////////
 enum byteORword
 {
     BYTE,
@@ -103,6 +103,7 @@ enum exec_command_status
 };
 
 char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword);
+char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc);
 
 
 int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw);

@@ -76,10 +76,10 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     {
         case ADD:
             printf("%o: ADD     ", *pc);
+            *pc += 2;
             op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
             op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
-            *pc += 2;
             printf("\n");
             add_op(op1, op2, psw);
             return EXEC_OK;
@@ -109,24 +109,25 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case MOV:
             printf("%o: MOV     ", *pc);
+            *pc += 2;
             op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
             printf(",");
             op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
-            *pc += 2;
             printf("\n");
             mov_op(op1, op2, psw);
             return EXEC_OK;
         case MOVb:
             printf("%o: MOVb    ", *pc);
+            *pc += 2;
             op3 = exec(ss, R, mem, pc, BYTE);
             printf(",");
             op4 = exec(dd, R, mem, pc, BYTE);
-            //printf("\nLOLOLO  %o\n", *(op3));
             mode = slice(inst, 3, 3);
-            if (*(uint16_t *)(mem + *pc) == 0177566)
-                printf("  [177566] = %c", *(int8_t*)op3);
+            if (*(uint16_t *)(mem + *pc - 2) == 0177566)
+                printf("  [177566] = %c", *(uint8_t*)op3);
+            if (*pc - 2 + (int16_t)2 + *(uint16_t*)(mem + *pc - 2) == 0177566)
+                printf("  [177566] = %c", *(int16_t*)op3);
             movb_op(op3, op4, psw, mode);
-            *pc += 2;
             printf("\n");
             return EXEC_OK;
         case SUB:
@@ -152,12 +153,21 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case ASHC:
             printf("%o: ASHC", *pc);
             return EXEC_OK;
-        case JSR:
-            printf("%o: JSR     ", *pc);
-            op1 = (int16_t)(slice(inst, 6, 3));
-            printf("r%o,", op1);
+        case DIV:
+            printf("%o: DIV     ", *pc);
             *pc += 2;
             op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            op1 = (int16_t)(slice(inst, 6, 3));
+            printf(",r%o", op1);
+            div_op(op1, op3, R, psw);
+            printf("\n");
+            return EXEC_OK;
+        case JSR:
+            printf("%o: JSR     ", *pc);
+            *pc += 2;
+            op1 = (int16_t)(slice(inst, 6, 3));
+            printf("r%o,", op1);
+            op3 = (int16_t*)execjump(dd, R, mem, pc);
             jsr_op(op1, op3, pc, R, mem);
             printf("\n");
             return EXEC_OK;
@@ -175,10 +185,10 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case MUL:
             printf("%o: MUL     ", *pc);
-            op1 = (int16_t)(slice(inst, 6, 3));
-            printf("r%o,", op1);
             *pc += 2;
+            op1 = (int16_t)(slice(inst, 6, 3));
             op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf(",r%o", op1);
             mul_op(op1, op3, R, psw);
             printf("\n");
             return EXEC_OK;
@@ -194,94 +204,94 @@ int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     switch(opcode)
     {
         case BCC:
-            printf("%o: BCC", *pc);
+            printf("%o: BCC     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bcc_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BCS:
-            printf("%o: BCS", *pc);
+            printf("%o: BCS     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bcs_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BEQ:
             printf("%o: BEQ     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             beq_op(&offset, pc, psw);
-            printf("%06o\n", *pc);
             return EXEC_OK;
         case BGE:
-            printf("%o: BGE", *pc);
+            printf("%o: BGE     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bge_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BGT:
-            printf("%o: BGT", *pc);
+            printf("%o: BGT     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bgt_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BHI:
-            printf("%o: BHI", *pc);
+            printf("%o: BHI     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bhi_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BLE:
-            printf("%o: BLE", *pc);
+            printf("%o: BLE     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             ble_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BLT:
-            printf("%o: BLT", *pc);
+            printf("%o: BLT     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             blt_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BLOS:
-            printf("%o: BLOS", *pc);
+            printf("%o: BLOS    ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             blos_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BMI:
-            printf("%o: BMI", *pc);
+            printf("%o: BMI     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bmi_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BNE:
-            printf("%o: BNE", *pc);
+            printf("%o: BNE     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bne_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BPL:
-            printf("%o: BPL", *pc);
+            printf("%o: BPL     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bpl_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BR:
-            printf("%o: BR", *pc);
+            printf("%o: BR      ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             br_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BVC:
-            printf("%o: BVC", *pc);
+            printf("%o: BVC     ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bvc_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         case BVS:
-            printf("%o: BVS", *pc);
+            printf("%o: BVS    ", *pc);
             *pc += 2;
+            printf("%06o\n", *pc + (offset << 1));
             bvs_op(&offset, pc, psw);
-            printf("\n");
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -297,9 +307,9 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     switch(opcode)
     {
         case ADC:
-            printf("%o: ADC", *pc);
-            op = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf("%o: ADC     ", *pc);
             *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             adc_op(op, psw);
             printf("\n");
             return EXEC_OK;
@@ -313,15 +323,19 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: ASLb", *pc);
             return EXEC_OK;
         case ASR:
-            printf("%o: ASR", *pc);
+            printf("%o: ASR     ", *pc);
+            *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
+            asr_op(op, psw);
+            printf("\n");
             return EXEC_OK;
         case ASRb:
             printf("%o: ASRb", *pc);
             return EXEC_OK;
         case CLR:
             printf("%o: CLR     ", *pc);
-            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             clr_op(op, psw);
             printf("\n");
             return EXEC_OK;
@@ -336,8 +350,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case DEC:
             printf("%o: DEC     ", *pc);
-            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             dec_op(op, psw);
             printf("\n");
             return EXEC_OK;
@@ -345,9 +359,9 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: DECb", *pc);
             return EXEC_OK;
         case INC:
-            printf("%o: INC", *pc);
-            op = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf("%o: INC     ", *pc);
             *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             inc_op(op, psw);
             printf("\n");
             return EXEC_OK;
@@ -400,8 +414,8 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             return EXEC_OK;
         case TSTb:
             printf("%o: TSTb    ", *pc);
-            opbyte = (int8_t*)exec(dd, R, mem, pc, WORD);
             *pc += 2;
+            opbyte = (int8_t*)exec(dd, R, mem, pc, WORD);
             tstb_op(opbyte, psw);
             printf("\n");
             return EXEC_OK;
@@ -429,11 +443,9 @@ int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
 
 char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
 {
-
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
     int16_t buf;
-    int16_t abc[2];
     switch(mode)
     {
         case 0:
@@ -446,8 +458,8 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             if (reg == 7)
             {
                 *pc += 2;
-                printf("#%06o", *(uint16_t *)(mem + *pc));
-                return mem + *pc;
+                printf("#%06o", *(uint16_t *)(mem + *pc - 2));
+                return mem + *pc - 2;
             }
             printf("(r%o)+", reg);
             buf = R[reg];
@@ -457,9 +469,9 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             if (reg == 7)
             {
                 *pc += 2;
-                printf("@#%06o", *(uint16_t *)(mem + *pc));
+                printf("@#%06o", *(uint16_t *)(mem + *pc - 2));
                 //printf("\nLOLOLO  %o\n", *(int8_t *)(mem + *(int16_t *)(mem + *pc)));
-                return mem + *(uint16_t *)(mem + *pc);
+                return mem + *(uint16_t *)(mem + *pc -  2);
             }
             printf("@(r%o)+", reg);
             buf = R[reg];
@@ -476,20 +488,61 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
         case 6:
             if (reg == 7)
             {
-                printf("%06o", *(uint16_t*)(mem + *pc));
                 *pc += 2;
-                abc[0] = *pc + *(uint16_t*)(mem + *pc - 2);
-                return (char*)(abc + 0);
+                printf("%06o", *pc  + *(uint16_t*)(mem + *pc - 2));
+                return mem + *pc + *(uint16_t*)(mem + *pc - 2) ;
             }
-            buf = *(uint16_t *)(mem + *pc + 2);
-            printf("%06o(r%o)", buf, reg);
-            return mem + R[reg] + buf;
+            *pc += 2;
+            printf("%06o(r%o)", *(uint16_t *)(mem + *pc - 2), reg);
+            return mem + R[reg] + *(int16_t *)(mem + *pc - 2);
         case 7:
-            return NULL;
+            if (reg == 7)
+            {
+                *pc += 2;
+                printf("@%06o", *(uint16_t*)(mem + *pc - 2));
+                return mem + *(uint16_t*)(mem + *pc - 2 + *(uint16_t *)(mem + *pc - 2));
+            }
+            printf("@%06o(r%o)", *(uint16_t *)(mem + *pc), reg);
+            return mem + *(uint16_t*)(mem + R[reg] + *(uint16_t *)(mem + *pc));
         default:
             return NULL;
 
     }
+}
+char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
+{
+    int16_t mode = (operand >> 3) & (int16_t)(0x7);
+    int16_t reg = operand & (int16_t)(0x7);
+    int16_t buf;
+    int16_t abc[2];
+    switch(mode)
+    {
+        case 6:
+            if (reg == 7)
+            {
+                *pc += 2;
+                printf("%06o", *pc - 2 + *(uint16_t*)(mem + *pc - 2));
+                abc[0] = *pc - 2 + *(uint16_t*)(mem + *pc - 2);
+                return (char*)(abc + 0);
+            }
+            *pc += 2;
+            printf("%06o(r%o)", *(uint16_t *)(mem + *pc - 2), reg);
+            abc[0] = R[reg] + *(uint16_t *)(mem + *pc - 2);
+            return (char*)(abc + 0);
+        case 7:
+            if (reg == 7)
+            {
+                *pc += 2;
+                printf("@%06o", *(uint16_t*)(mem + *pc - 2));
+                return mem + *pc - 2 + *(uint16_t *)(mem + *pc - 2);
+            }
+            printf("@%06o(r%o)", *(uint16_t *)(mem + *pc - 2), reg);
+            return mem + R[reg] + *(uint16_t *)(mem + *pc - 2);
+        default:
+            return NULL;
+    }
+
+
 }
 
 int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw)
