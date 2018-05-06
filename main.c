@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
     printf("\n---------------- running --------------\n");
     while (1)
     {
-        int op_status = exec_command(R, mem, &R[7], &psw);
+        int op_status = exec_command(R, mem, (uint16_t*)(&R[7]), &psw);
         if (op_status == EXEC_EXIT)
             break;
     }

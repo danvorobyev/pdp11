@@ -142,15 +142,16 @@ inline void sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw)
 inline void jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R)
 {
     R[6] = R[op1];
+    R[6] -= 2;
     R[op1] = *pc;
     *pc = *op2;
 }
 
-inline void rts_op(int16_t* op1, int16_t* pc, int16_t* R)
+inline void rts_op(int16_t* op1, int16_t* pc, int16_t* R, char* mem)
 {
     *pc = R[*op1];
-    R[*op1] = R[6];
     R[6] += 2;
+    R[*op1] = R[6];
 }
 
 //*************************** BRANCH *****************************

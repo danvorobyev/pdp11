@@ -155,10 +155,9 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case JSR:
             printf("%o: JSR     ", *pc);
             op1 = (int16_t)(slice(inst, 6, 3));
-            printf("%06o,", op1);
-            op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
-            printf("op");
+            printf("r%o,", op1);
             *pc += 2;
+            op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
             jsr_op(op1, op3, pc, R);
             printf("\n");
             return EXEC_OK;
@@ -198,10 +197,10 @@ int decode_D_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("\n");
             return EXEC_OK;
         case BEQ:
-            printf("%o: BEQ", *pc);
+            printf("%o: BEQ     ", *pc);
             *pc += 2;
             beq_op(&offset, pc, psw);
-            printf("\n");
+            printf("%06o\n", *pc);
             return EXEC_OK;
         case BGE:
             printf("%o: BGE", *pc);
@@ -409,9 +408,10 @@ int decode_F_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     switch(opcode)
     {
         case RTS:
-            printf("%o: RTS", *pc);
+            printf("%o: RTS     r%o", *pc, reg);
             *pc += 2;
-            rts_op(&reg, pc, R);
+            rts_op(&reg, pc, R, mem);
+            printf("\n");
             return EXEC_OK;
         default:
             return EXEC_EXIT;
@@ -424,16 +424,15 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
     int16_t buf;
+    int16_t abc[2];
     switch(mode)
     {
         case 0:
             printf("r%o", reg);
             return (char*)(R+reg);
-
         case 1:
             printf("(r)%o", reg);
             return mem + R[reg];
-
         case 2:
             if (reg == 7)
             {
@@ -468,8 +467,10 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
         case 6:
             if (reg == 7)
             {
+                printf("%06o", *(uint16_t*)(mem + *pc));
                 *pc += 2;
-                printf("&06o",* (int16_t*)(mem + *pc));
+                abc[0] = *pc + *(uint16_t*)(mem + *pc - 2);
+                return (char*)(abc + 0);
             }
             buf = *(uint16_t *)(mem + *pc + 2);
             printf("%06o(r%o)", buf, reg);
@@ -486,7 +487,6 @@ int exec_command(int16_t* R, char* mem, int16_t* pc, int16_t* psw)
 {
     int16_t inst = *(int16_t*)(mem + *pc); // for 16bit instructions
     int ret_status;
-
     while(1)
     {
         ret_status = decode_A_type(inst, R, mem, pc, psw);
