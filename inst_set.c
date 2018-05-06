@@ -9,6 +9,7 @@ extern void  neg_op(int16_t* op1, int16_t* psw);
 extern void  mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw);
 extern void  div_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw);
 extern void  sub_op(int16_t* op1, int16_t* op2, int16_t* psw);
+inline void cmp_op(int16_t* op1, int16_t* op2, int16_t* psw);
 
 
 extern void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw);
@@ -18,7 +19,7 @@ extern void  clr_op(int16_t* op1, int16_t* psw);
 extern void  sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw);
 extern void  jsr_op(int16_t op1, int16_t* op2, int16_t* pc, int16_t* R, char* mem);
 extern void  rts_op(int16_t* op1, int16_t* pc, int16_t* R, char* mem);
-extern void jmp_op(int16_t* op1, int16_t* pc);
+extern void  jmp_op(int16_t* op1, int16_t* pc);
 
 extern void  bcc_op(int16_t* offset, int16_t* pc, int16_t* psw);
 extern void  bcs_op(int16_t * offset, int16_t* pc, int16_t* psw);
