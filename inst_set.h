@@ -96,7 +96,6 @@ inline void neg_op(int16_t* op1, int16_t* psw)
 
 inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
 {
-    /////////////
     int32_t res = R[op1] * (*op2);
 
     if(op1 % 2 == 0){
@@ -110,6 +109,20 @@ inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
     *psw = (res == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (*psw & V_to_zero);
     *psw = ((res < -0x8000) || (res > 0x7FFF)) ?  (*psw | C_mask) : (*psw & C_to_zero);
+}
+
+inline void div_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw) {
+    if (op1 % 2 == 0) {
+        int32_t buf = (int32_t) (((R[op1] << 16) & 0xFFFF0000) | (R[op1 + 1] & 0xFFFF));
+        R[op1] = (int16_t) (buf / *op2);
+        int16_t sign = (int16_t) (R[op1] & 0x8000);
+        R[op1 + 1] = (int16_t) ((buf % *op2) | sign);
+    }
+
+    *psw = (R[op1] < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (R[op1] == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = ((op1 % 2 == 1) || (*op2 == 0) || (R[op1] > *op2)) ?  (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = (*op2 == 0) ?  (*psw | C_mask) : (*psw & C_to_zero);
 }
 
 //************************ STORE AND LOAD ************************
