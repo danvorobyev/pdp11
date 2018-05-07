@@ -64,6 +64,18 @@ inline void inc_op(int16_t* op1, int16_t* psw)
 
 }
 
+inline void ash(int16_t op1, int16_t op2, int16_t* psw, int16_t* R)
+{
+    int16_t sign_op2 = ((op2) >> 5) & (int16_t)0x1;
+    int16_t n = (0x3f & (int16_t)0x1f);
+    if (sign_op2 == 0){
+        R[op1] = (R[op1] << n);
+    }
+    else{
+        R[op1] = (R[op1] >> n);
+    }
+}
+
 inline void incb_op(char* op1, int16_t* psw, int mode)
 {
     *psw = ((int16_t)(*op1) == 0177) ? (*psw | V_mask) : (*psw & V_to_zero);
