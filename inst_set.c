@@ -14,9 +14,10 @@ extern void  cmp_op(int16_t* op1, int16_t* op2, int16_t* psw);
 extern void  asr_op(int16_t* op1, int16_t* psw);
 extern void  asl_op(int16_t* op1, int16_t* psw);
 extern void  bic_op(int16_t* op1, int16_t* op2, int16_t* psw);
+extern void  ash_op(int16_t op1, int16_t* op2, int16_t* psw, int16_t* R);
 
 extern void  mov_op(int16_t* op1, int16_t* op2, int16_t* psw);
-extern void  movb_op(char* op1, char* op2, int16_t* psw, int mode);
+extern void  movb_op(int8_t* op1, char* op2, int16_t* psw, int mode);
 extern void  clr_op(int16_t* op1, int16_t* psw);
 
 extern void  sob_op(int16_t* op1, int16_t* op2, int16_t* pc, int16_t* psw);

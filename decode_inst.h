@@ -90,6 +90,7 @@ enum opcode
     TSTb   = 0105700,
     XOR    = 0074000
 };
+
 enum byteORword
 {
     BYTE,

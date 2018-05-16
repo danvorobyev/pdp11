@@ -7,7 +7,9 @@
 
 #define slice(val, lsb, len) (((val) >> (lsb)) & ((1 << (len)) - 1))
 
+int16_t abc[2];
 
+extern FILE* f1;
 
 int decode_A_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw) // opcode = 16
 {
@@ -65,7 +67,7 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     int opcode = B_type & inst;
     int16_t* op1;
     int16_t* op2;
-    char* op3 = NULL;
+    int8_t* op3 ;
     char* op4;
     int mode;
 
@@ -84,9 +86,13 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             add_op(op1, op2, psw);
             return EXEC_OK;
         case BIC:
-            printf("%o: BIC", *pc);
+            printf("%o: BIC     ", *pc);
             *pc += 2;
-
+            op1 = (int16_t*)exec(ss, R, mem, pc, WORD);
+            printf(",");
+            op2 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf("\n");
+            bic_op(op1, op2, psw);
             return EXEC_OK;
         case BICb:
             printf("%o: BICb", *pc);
@@ -108,7 +114,7 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             *pc += 2;
             op1 = (int16_t *)exec(ss, R, mem, pc, WORD);
             printf(",");
-            op2 = (int16_t *)exec(ss, R, mem, pc, WORD);
+            op2 = (int16_t *)exec(dd, R, mem, pc, WORD);
             cmp_op(op1, op2, psw);
             printf("\n");
             return EXEC_OK;
@@ -127,14 +133,14 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case MOVb:
             printf("%o: MOVb    ", *pc);
             *pc += 2;
-            op3 = exec(ss, R, mem, pc, BYTE);
+            op3 = (int8_t*)exec(ss, R, mem, pc, BYTE);
             printf(",");
             op4 = exec(dd, R, mem, pc, BYTE);
             mode = slice(inst, 3, 3);
             if (*(uint16_t *)(mem + *pc - 2) == 0177566)
-                printf("  [177566] = %c", *(uint8_t*)op3);
+                fprintf(f1, "%c", *(uint8_t*)op3);
             if (*pc - 2 + (int16_t)2 + *(uint16_t*)(mem + *pc - 2) == 0177566)
-                printf("  [177566] = %c", *(int16_t*)op3);
+                fprintf(f1, "%c", *(int16_t*)op3);
             movb_op(op3, op4, psw, mode);
             printf("\n");
             return EXEC_OK;
@@ -162,7 +168,13 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     switch(opcode)
     {
         case ASH:
-            printf("%o: ASH", *pc);
+            printf("%o: ASH     ", *pc);
+            *pc += 2;
+            op3 = (int16_t*)exec(dd, R, mem, pc, WORD);
+            op1 = (int16_t)slice(inst, 6, 3);
+            printf(",r%o", op1);
+            ash_op(op1, op3, psw, R);
+            printf("\n");
             return EXEC_OK;
         case ASHC:
             printf("%o: ASHC", *pc);
@@ -190,7 +202,7 @@ int decode_C_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op1 = (int16_t)(slice(inst, 6, 3));
             op2 = dd;
             *pc += 2;
-            printf ("r%o,%06o", op1, *pc + 2 - (op2 << 1));
+            printf ("r%o,%06o", op1, *pc - (op2 << 1));
             printf("\n");
             sob_op(&R[op1], &op2, pc, psw);
             return EXEC_OK;
@@ -317,7 +329,9 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
     int opcode = E_type & inst;
     int16_t* op;
     int8_t* opbyte;
+    char* opbyte1;
     int16_t dd =(int16_t)(slice(inst, 0, 6));
+    int mode;
     switch(opcode)
     {
         case ADC:
@@ -331,7 +345,11 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: ADCb", *pc);
             return EXEC_OK;
         case ASL:
-            printf("%o: ASL", *pc);
+            printf("%o: ASL     ", *pc);
+            *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
+            asl_op(op, psw);
+            printf("\n");
             return EXEC_OK;
         case ASLb:
             printf("%o: ASLb", *pc);
@@ -380,7 +398,12 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("\n");
             return EXEC_OK;
         case INCb:
-            printf("%o: INCb", *pc);
+            printf("%o: INCb    ", *pc);
+            *pc += 2;
+            opbyte1 = exec(dd, R, mem, pc, BYTE);
+            mode = slice(inst, 3, 3);
+            incb_op(opbyte1, psw, mode);
+            printf("\n");
             return EXEC_OK;
         case JMP:
             printf("%o: JMP     ", *pc);
@@ -424,9 +447,9 @@ int decode_E_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             printf("%o: SXT", *pc);
             return EXEC_OK;
         case TST:
-            printf("%o: TST", *pc);
-            op = (int16_t*)exec(dd, R, mem, pc, WORD);
+            printf("%o: TST     ", *pc);
             *pc += 2;
+            op = (int16_t*)exec(dd, R, mem, pc, WORD);
             tst_op(op, psw);
             printf("\n");
             return EXEC_OK;
@@ -464,13 +487,14 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
     int16_t buf;
+    int16_t a;
     switch(mode)
     {
         case 0:
             printf("r%o", reg);
             return (char*)(R+reg);
         case 1:
-            printf("(r)%o", reg);
+            printf("(r%o)", reg);
             return mem + R[reg];
         case 2:
             if (reg == 7)
@@ -488,7 +512,6 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             {
                 *pc += 2;
                 printf("@#%06o", *(uint16_t *)(mem + *pc - 2));
-                //printf("\nLOLOLO  %o\n", *(int8_t *)(mem + *(int16_t *)(mem + *pc)));
                 return mem + *(uint16_t *)(mem + *pc -  2);
             }
             printf("@(r%o)+", reg);
@@ -497,28 +520,31 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             return mem + *(uint16_t *)(mem + buf);
         case 4:
             printf("-(r%o)", reg);
-            R[reg] -= 1 + byteORword;
+            R[reg] -= (1 + byteORword);
             return mem + R[reg];
         case 5:
             printf("@-(r%o)", reg);
             R[reg] -= 2;
-            return mem + *(uint16_t *)(mem + R[reg]);
+            return mem + *(int16_t *)(mem + R[reg]);
         case 6:
             if (reg == 7)
             {
+                a = *pc;
                 *pc += 2;
-                printf("%06o", *pc  + *(uint16_t*)(mem + *pc - 2));
-                return mem + *pc + *(uint16_t*)(mem + *pc - 2) ;
+                printf("%06o", (uint16_t)(a + *(int16_t*)(mem + a)));
+                return mem + a + *(int16_t*)(mem + *pc) ;
             }
+            a = *pc;
             *pc += 2;
-            printf("%06o(r%o)", *(uint16_t *)(mem + *pc - 2), reg);
-            return mem + R[reg] + *(int16_t *)(mem + *pc - 2);
+            printf("%06o(r%o)", *(uint16_t *)(mem + a), reg);
+            return mem + R[reg] + *(int16_t *)(mem + a);
         case 7:
             if (reg == 7)
             {
+                a = *pc;
                 *pc += 2;
-                printf("@%06o", *(uint16_t*)(mem + *pc - 2));
-                return mem + *(uint16_t*)(mem + *pc - 2 + *(uint16_t *)(mem + *pc - 2));
+                printf("@%06o", *(uint16_t*)(mem + a));
+                return mem + *(uint16_t*)(mem + a + *(uint16_t *)(mem + a));
             }
             printf("@%06o(r%o)", *(uint16_t *)(mem + *pc), reg);
             return mem + *(uint16_t*)(mem + R[reg] + *(uint16_t *)(mem + *pc));
@@ -532,8 +558,6 @@ char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
 {
     int16_t mode = (operand >> 3) & (int16_t)(0x7);
     int16_t reg = operand & (int16_t)(0x7);
-    int16_t buf;
-    int16_t abc[2];
     switch(mode)
     {
         case 6:
@@ -541,12 +565,12 @@ char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
             {
                 *pc += 2;
                 printf("%06o", *pc  + *(uint16_t*)(mem + *pc - 2));
-                abc[0] = *pc + *(uint16_t*)(mem + *pc - 2);
+                abc[0] = *pc + *(int16_t*)(mem + *pc - 2);
                 return (char*)(abc + 0);
             }
             *pc += 2;
             printf("%06o(r%o)", *(uint16_t *)(mem + *pc - 2), reg);
-            abc[0] = R[reg] + *(uint16_t *)(mem + *pc - 2);
+            abc[0] = R[reg] + *(int16_t *)(mem + *pc - 2);
             return (char*)(abc + 0);
         case 7:
             if (reg == 7)

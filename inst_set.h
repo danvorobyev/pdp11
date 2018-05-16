@@ -34,8 +34,8 @@ inline void  add_op(int16_t* op1, int16_t* op2, int16_t* psw)
 
     *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1) ^ (0x1)) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = (sign_op2 & sign_sum == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
+    *psw = ((((sign_op1 ^ sign_op2) | ((sign_op1 + sign_sum) & 0x1)) ^ (0x1)) == 0) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((sign_op2 & sign_sum) == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
 inline void sub_op(int16_t* op1, int16_t* op2, int16_t* psw)
@@ -49,8 +49,8 @@ inline void sub_op(int16_t* op1, int16_t* op2, int16_t* psw)
 
     *psw = (*op2 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op2 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = ((sign_op1 ^ sign_op2) & (sign_op2 ^ sign_sub) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = (sign_op2 & sign_sub == 1) ?  (*psw & C_to_zero) : (*psw | C_mask);
+    *psw = (((sign_op1 ^ sign_op2) & (sign_op2 ^ sign_sub)) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((sign_op2 & sign_sub) == 1) ?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
 inline void inc_op(int16_t* op1, int16_t* psw)
@@ -64,16 +64,25 @@ inline void inc_op(int16_t* op1, int16_t* psw)
 
 }
 
-inline void ash(int16_t op1, int16_t op2, int16_t* psw, int16_t* R)
+inline void ash_op(int16_t op1, int16_t* op2, int16_t* psw, int16_t* R)
 {
-    int16_t sign_op2 = ((op2) >> 5) & (int16_t)0x1;
-    int16_t n = (0x3f & (int16_t)0x1f);
-    if (sign_op2 == 0){
-        R[op1] = (R[op1] << n);
+    int16_t sign_op2 = (((*op2) >> 5) & (int16_t)0x1);
+    int16_t n = ((int16_t)0x3f & *op2) ;
+    if (sign_op2 == 0)
+    {
+        R[op1] = (R[op1] << abs(n));
+        *psw = (((*op2 >> 15) & 0x1) == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
     }
-    else{
-        R[op1] = (R[op1] >> n);
+    else
+    {
+        n = n | (int16_t)0xFFC0;
+        R[op1] = (R[op1] >> abs(n));
+        *psw = ((*op2 & 0x1) == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
     }
+    *psw = (R[op1] < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (R[op1] == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+
+
 }
 
 inline void incb_op(char* op1, int16_t* psw, int mode)
@@ -91,7 +100,7 @@ inline void incb_op(char* op1, int16_t* psw, int mode)
 
 inline void dec_op(int16_t* op1, int16_t* psw)
 {
-    *psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    //*psw = (*op1 == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
 
     *op1 -= 1;
 
@@ -109,7 +118,7 @@ inline void adc_op(int16_t* op1, int16_t* psw)
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = (buf == 077777) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = ((buf == 0177777) && ((*psw & C_mask) == 1))? (*psw | C_mask) : (*psw & C_to_zero);
+    //*psw = ((buf == 0177777) && ((*psw & C_mask) == 1))? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
 inline void sbc_op(int16_t* op1, int16_t* psw)
@@ -120,7 +129,7 @@ inline void sbc_op(int16_t* op1, int16_t* psw)
 
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (buf == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    //*psw = (buf == 0x8000) ? (*psw | V_mask) : (*psw & V_to_zero);
     *psw = ((buf == 000000) && ((*psw & C_mask) == 1))?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
@@ -130,7 +139,7 @@ inline void neg_op(int16_t* op1, int16_t* psw)
 
     *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = (*op1 == 0100000) ? (*psw | V_mask) : (*psw & V_to_zero);
+    //*psw = (*op1 == 0100000) ? (*psw | V_mask) : (*psw & V_to_zero);
     *psw = (*op1 == 0) ?  (*psw & C_to_zero) : (*psw | C_mask);
 }
 
@@ -138,10 +147,13 @@ inline void mul_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw)
 {
     int32_t res = R[op1] * (*op2);
 
-    if(op1 % 2 == 0){
+    if(op1 % 2 == 0)
+    {
         R[op1] = (int16_t)((res >> 16) & 0xFFFF);
         R[op1 + 1] = (int16_t)((res) & 0xFFFF);
-    } else{
+    }
+    else
+    {
         R[op1] = (int16_t)((res) & 0xFFFF);
     }
 
@@ -161,7 +173,7 @@ inline void div_op(int16_t op1, int16_t* op2, int16_t* R, int16_t* psw) {
 
     *psw = (R[op1] < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (R[op1] == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = ((op1 % 2 == 1) || (*op2 == 0) || (R[op1] > *op2)) ?  (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((op1 % 2 == 1) || (*op2 == 0) || (R[op1] < *op2)) ?  (*psw | V_mask) : (*psw & V_to_zero);
     *psw = (*op2 == 0) ?  (*psw | C_mask) : (*psw & C_to_zero);
 }
 
@@ -176,8 +188,8 @@ inline void cmp_op(int16_t* op1, int16_t* op2, int16_t* psw)
 
     *psw = (buf < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
     *psw = (buf == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
-    *psw = ((sign_op1 ^ sign_op2) & (sign_op1 ^ sign_buf) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
-    *psw = (sign_op1 & sign_buf == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
+    *psw = (((sign_op1 ^ sign_op2) & (sign_op1 ^ sign_buf)) == 1) ? (*psw | V_mask) : (*psw & V_to_zero);
+    *psw = ((sign_op1 & sign_buf) == 1) ? (*psw | C_mask) : (*psw & C_to_zero);
 }
 
 inline void asr_op(int16_t* op1, int16_t* psw)
@@ -232,15 +244,15 @@ inline void clr_op(int16_t* op1, int16_t* psw)
     *psw = (*psw & C_to_zero);
 }
 
-inline void movb_op(char* op1, char* op2, int16_t* psw, int mode)
+inline void movb_op(int8_t* op1, char* op2, int16_t* psw, int mode)
 {
     if(mode == 0)
-        *(int16_t*)op2 = *(int8_t*)(op1);
+        *(int16_t*)(op2) = *(op1);
     else
-        *(int8_t*)op2 = *(int8_t*)(op1);
+        *(int8_t*)(op2) = *(op1);
 
-    *psw = (*(int8_t*)op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
-    *psw = (*(int8_t*)op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
+    *psw = (*op1 < 0) ? (*psw | N_mask) : (*psw & N_to_zero);
+    *psw = (*op1 == 0) ? (*psw | Z_mask) : (*psw & Z_to_zero);
     *psw = *psw & V_to_zero;
 }
 
@@ -296,9 +308,9 @@ inline void bge_op(int16_t * offset, int16_t* pc, int16_t* psw) // N ^ V = 0
     *pc += (((((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
 }
 
-inline void bgt_op(int16_t * offset, int16_t* pc, int16_t* psw) // Z * (N ^ V) = 0
+inline void bgt_op(int16_t * offset, int16_t* pc, int16_t* psw) // Z | (N ^ V) = 0
 {
-    *pc += ((((*psw & Z_mask) >> 2) & (((*psw & N_mask) >> 3) ^ ((*psw & V_mask) >> 1)) & (int16_t)0x1) == 0) ? ((*offset) << 1) : 0;
+    *pc += ((((*psw & Z_mask) >> 2) | (((*psw & N_mask) >> 3) ^ ((((*psw & V_mask) >> 1)) & (int16_t)0x1)))) == 0 ? ((*offset) << 1) : 0;
 }
 
 inline void bhi_op(int16_t * offset, int16_t* pc, int16_t* psw) // C * Z = 0
