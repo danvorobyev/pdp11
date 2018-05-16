@@ -1,0 +1,7 @@
+; Print * 
+	.=1000
+putc:
+	tstb	@#177564
+	bpl	putc
+	movb	#'*, @#177566
+	halt
