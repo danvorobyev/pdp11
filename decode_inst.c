@@ -103,9 +103,6 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
         case BISb:
             printf("%o: BISb", *pc);
             return EXEC_OK;
-        case BIT:
-            printf("%o: BIC", *pc);
-            return EXEC_OK;
         case BITb:
             printf("%o: BITb", *pc);
             return EXEC_OK;
@@ -138,9 +135,20 @@ int decode_B_type(int16_t inst, int16_t *R, char *mem, int16_t *pc, int16_t* psw
             op4 = exec(dd, R, mem, pc, BYTE);
             mode = slice(inst, 3, 3);
             if (*(uint16_t *)(mem + *pc - 2) == 0177566)
-                fprintf(f1, "%c", *(uint8_t*)op3);
+            {
+                if(f1 == NULL)
+                    printf("     [0177566] = %c", *(uint8_t*)op3);
+                else
+                    fprintf(f1, "%c", *(uint8_t*)op3);
+            }
+
             if (*pc - 2 + (int16_t)2 + *(uint16_t*)(mem + *pc - 2) == 0177566)
-                fprintf(f1, "%c", *(int16_t*)op3);
+            {
+                if(f1 == NULL)
+                    printf("     [0177566] = %c", *(int16_t*)op3);
+                else
+                    fprintf(f1, "%c", *(int16_t*)op3);
+            }
             movb_op(op3, op4, psw, mode);
             printf("\n");
             return EXEC_OK;
@@ -537,7 +545,7 @@ char* exec(int16_t operand, int16_t * R, char* mem, int16_t *pc, int byteORword)
             a = *pc;
             *pc += 2;
             printf("%06o(r%o)", *(uint16_t *)(mem + a), reg);
-            return mem + R[reg] + *(int16_t *)(mem + a);
+            return mem + R[reg] + *(uint16_t *)(mem + a);
         case 7:
             if (reg == 7)
             {
@@ -564,7 +572,7 @@ char* execjump(int16_t operand, int16_t * R, char* mem, int16_t *pc)
             if (reg == 7)
             {
                 *pc += 2;
-                printf("%06o", *pc  + *(uint16_t*)(mem + *pc - 2));
+                printf("%06o", *pc  + *(int16_t*)(mem + *pc - 2));
                 abc[0] = *pc + *(int16_t*)(mem + *pc - 2);
                 return (char*)(abc + 0);
             }

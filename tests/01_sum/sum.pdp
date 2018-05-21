@@ -1,6 +1,5 @@
 	. = 1000
-	mov 	#2, R0
-	mov 	#3, R1
-	add		R0, R1
+	mov 	#19,r0
+	div #2,r0
 	halt
 	

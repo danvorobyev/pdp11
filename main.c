@@ -18,12 +18,12 @@ int main(int argc, char * argv[])
 
 //**************WRITING IN FILE***************
 
-    f1 = fopen("print.txt", "w");
-    if (f1 == NULL)
-    {
-        perror("print.txt");
-        exit (1);
-    }
+    f1 = fopen(argv[2], "w");
+//    if (f1 == NULL)
+//    {
+//        perror("print.txt");
+//        exit (1);
+//    }
     mem[WRITE] = (char)0200;
 
 //************LOADING INFORMATION*************
@@ -37,7 +37,6 @@ int main(int argc, char * argv[])
     while (1)
     {
         int op_status = exec_command(R, mem, &R[7], &psw);
-        //printf("%06o R[6] = %06o\n", *(int16_t*)(mem + R[6]), R[6]);
         if (op_status == EXEC_EXIT)
             break;
     }
